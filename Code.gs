@@ -805,7 +805,7 @@ function getApprovalStepsForData(requestData, includeFinalSteps = false) {
     const route = requestData.gap <= 0
       ? ["Plant Head", "BU Head"]
       : getApprovalRoute(getNormalizedRequestType(requestData), requestData.category);
-
+    
     steps = route.map(label => ({
       label: label,
       approver: getApproverEmailByRole(label, tempRequest) || label
