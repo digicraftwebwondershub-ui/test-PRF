@@ -172,6 +172,16 @@ function appendApprovalHistoryEntry(requestID, entry) {
   return history;
 }
 
+function getRequestApprovalStatus(request, label) {
+  if (!request) return "";
+  const norm = normalizeRequestValue(label);
+  if (norm.indexOf("plant") !== -1) return normalizeRequestValue(request.plantHeadApproval);
+  if (norm.indexOf("bu") !== -1 || norm.indexOf("business") !== -1) return normalizeRequestValue(request.buHeadApproval);
+  if (norm.indexOf("legal") !== -1) return normalizeRequestValue(request.legalApproval);
+  if (norm.indexOf("corporate") !== -1 && (norm.indexOf("hrod") !== -1 || norm.indexOf("hr") !== -1)) return normalizeRequestValue(request.corporateHrodApproval);
+  return "";
+}
+
 function getApprovalRemarkConfig(levelLabel) {
   const normalizedLabel = normalizeRequestValue(levelLabel);
   for (let i = 0; i < APPROVAL_REMARK_COLUMNS.length; i++) {
@@ -198,17 +208,25 @@ function matchesApprovalIdentity(value, user) {
   return getApprovalUserIdentifiers(user).indexOf(normalizedValue) >= 0;
 }
 
-function findApprovalStepIndex(steps, approverOrLabel) {
+function findApprovalStepIndex(steps, approverOrLabel, request = null) {
   const normalized = normalizeRequestValue(approverOrLabel);
   if (!normalized) {
     return -1;
   }
 
   for (let i = 0; i < steps.length; i++) {
-    if (
-      normalizeRequestValue(steps[i].approver) === normalized ||
-      normalizeRequestValue(steps[i].label) === normalized
-    ) {
+    const stepLabel = steps[i].label;
+    const isMatch = normalizeRequestValue(steps[i].approver) === normalized ||
+                    normalizeRequestValue(stepLabel) === normalized;
+
+    if (isMatch) {
+      // If request is provided, skip already approved stages even if email matches
+      if (request) {
+        const status = getRequestApprovalStatus(request, stepLabel);
+        if (status === "approved") {
+          continue;
+        }
+      }
       return i;
     }
   }
@@ -261,7 +279,7 @@ function resolveCurrentApprovalLevelLabel(request, approvalSteps, approvalHistor
   }
 
   if (request.currentApprover && request.currentApprover !== "Completed" && request.currentApprover !== "Requestor") {
-    const currentIndex = findApprovalStepIndex(approvalSteps, request.currentApprover);
+    const currentIndex = findApprovalStepIndex(approvalSteps, request.currentApprover, request);
     if (currentIndex >= 0) {
       return approvalSteps[currentIndex].label;
     }
@@ -455,7 +473,7 @@ function getApprovalViewStateForUser(request, user) {
   }
 
   const furthestUserIndex = userStepIndexes[userStepIndexes.length - 1];
-  const currentIndex = findApprovalStepIndex(approvalSteps, request.currentApprover);
+  const currentIndex = findApprovalStepIndex(approvalSteps, request.currentApprover, request);
 
   if (request.status === "Approved") {
     return "approved";
@@ -1388,7 +1406,7 @@ function approveRequest(requestID, action, comments) {
   
   const manpowerData = request.manpowerData || {};
   const isExceptional = manpowerData.isExceptional === true || manpowerData.isExceptional === "true";
-  const currentIndex = findApprovalStepIndex(approvalSteps, request.currentApprover);
+  const currentIndex = findApprovalStepIndex(approvalSteps, request.currentApprover, request);
   const currentLevel = currentIndex >= 0 && approvalSteps[currentIndex]
     ? approvalSteps[currentIndex].label
     : request.currentApprover;

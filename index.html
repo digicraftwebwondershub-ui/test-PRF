@@ -2190,8 +2190,32 @@
             return (list || []).find(req => req.requestID === requestID) || null;
         }
 
+        function getStepApprovalStatus(request, label) {
+            if (!request) return "";
+            const norm = (label || "").toLowerCase().trim();
+            if (norm.indexOf("plant") !== -1) return (request.plantHeadApproval || "").toLowerCase().trim();
+            if (norm.indexOf("bu") !== -1 || norm.indexOf("business") !== -1) return (request.buHeadApproval || "").toLowerCase().trim();
+            if (norm.indexOf("legal") !== -1) return (request.legalApproval || "").toLowerCase().trim();
+            if (norm.indexOf("corporate") !== -1 && (norm.indexOf("hrod") !== -1 || norm.indexOf("hr") !== -1)) return (request.corporateHrodApproval || "").toLowerCase().trim();
+            return "";
+        }
+
         function getCurrentApprovalStepIndex(request) {
-            return (request.approvalSteps || []).findIndex(step => step.approver === request.currentApprover || step.label === request.currentApprover);
+            const steps = request.approvalSteps || [];
+            const currentApprover = (request.currentApprover || "").toString().trim();
+
+            for (let i = 0; i < steps.length; i++) {
+                const step = steps[i];
+                if (step.approver === currentApprover || step.label === currentApprover) {
+                    // Check if this specific stage is already approved
+                    const status = getStepApprovalStatus(request, step.label);
+                    if (status === "approved") {
+                        continue; // Skip and look for the next match
+                    }
+                    return i;
+                }
+            }
+            return -1;
         }
 
         function getApprovalRemark(request, step, index) {
