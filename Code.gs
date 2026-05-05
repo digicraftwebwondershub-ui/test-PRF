@@ -587,14 +587,14 @@ function getCurrentUserEmail() {
  * Get user role from Users sheet
  */
 function getUserRole() {
-  const email = getCurrentUserEmail();
+  const email = normalizeRequestValue(getCurrentUserEmail());
   const sheet = SpreadsheetApp.openById(SHEET_ID).getSheetByName(SHEET_NAMES.USERS);
   const data = sheet.getDataRange().getValues();
   
   for (let i = 1; i < data.length; i++) {
-    if (data[i][0] === email) {
+    if (normalizeRequestValue(data[i][0]) === email) {
       return {
-        email: email,
+        email: getCurrentUserEmail(),
         role: data[i][1] || "Requestor",
         name: data[i][2] || "User",
         department: data[i][3] || "",
@@ -635,7 +635,10 @@ function getInitialData() {
  * Get company structure (Divisions, Groups, Departments, Sections, Units, Lines)
  */
 
+let _cachedStructure = null;
 function getCompanyStructure() {
+  if (_cachedStructure) return _cachedStructure;
+
   const sheet = SpreadsheetApp.openById(SHEET_ID).getSheetByName(SHEET_NAMES.OPTIMUM_HC);
   const data = sheet.getDataRange().getValues();
   // Assume header row: Division, Group, Department, Section, Unit, Line, Optimum HC, Plant Head, BU Head, Managing Director, Category
@@ -705,6 +708,7 @@ function getCompanyStructure() {
       addCat(structure[division].groups[group].departments[department].sections[section].units[unit]._categories);
     }
   }
+  _cachedStructure = structure;
   return structure;
 }
 
@@ -776,26 +780,6 @@ function getApprovalStepsForData(requestData, includeFinalSteps = false) {
     requestData.line
   );
 
-  let route = [];
-  if (orgSteps.length) {
-    route = orgSteps.map(step => step.label);
-  } else {
-    route = requestData.gap <= 0
-      ? ["Plant Head", "BU Head"]
-      : getApprovalRoute(getNormalizedRequestType(requestData), requestData.category);
-  }
-
-  // If includeFinalSteps is true, always append Legal and Corporate HROD if they aren't there
-  // This is primarily for the frontend workflow tracker to show all 6 steps
-  if (includeFinalSteps) {
-    if (route.indexOf("Legal Team") === -1 && route.indexOf("Legal") === -1) {
-      route.push("Legal Team");
-    }
-    if (route.indexOf("Corporate HROD") === -1) {
-      route.push("Corporate HROD");
-    }
-  }
-
   // Build temporary request object for lookups
   const tempRequest = {
     division: requestData.division,
@@ -803,13 +787,50 @@ function getApprovalStepsForData(requestData, includeFinalSteps = false) {
     department: requestData.department,
     section: requestData.section,
     unit: requestData.unit,
-    line: requestData.line
+    line: requestData.line,
+    requestType: requestData.requestType,
+    category: requestData.category,
+    gap: requestData.gap
   };
 
-  return route.map(label => {
-    const email = getApproverEmailByRole(label, tempRequest);
-    return { label: label, approver: email || label };
-  });
+  let steps = [];
+  if (orgSteps && orgSteps.length > 0) {
+    // Use the steps directly from org structure if they exist
+    steps = orgSteps.map(step => ({
+      label: step.label,
+      approver: (step.approver && step.approver.indexOf('@') !== -1) ? step.approver : (getApproverEmailByRole(step.label, tempRequest) || step.approver)
+    }));
+  } else {
+    // Otherwise fallback to getApprovalRoute
+    const route = requestData.gap <= 0
+      ? ["Plant Head", "BU Head"]
+      : getApprovalRoute(getNormalizedRequestType(requestData), requestData.category);
+
+    steps = route.map(label => ({
+      label: label,
+      approver: getApproverEmailByRole(label, tempRequest) || label
+    }));
+  }
+
+  // If includeFinalSteps is true, always append Legal and Corporate HROD if they aren't there
+  // This is primarily for the frontend workflow tracker to show all 6 steps
+  if (includeFinalSteps) {
+    const labels = steps.map(s => s.label.toLowerCase());
+    if (labels.indexOf("legal team") === -1 && labels.indexOf("legal") === -1) {
+      steps.push({
+        label: "Legal Team",
+        approver: getApproverEmailByRole("Legal Team", tempRequest) || "Legal Team"
+      });
+    }
+    if (labels.indexOf("corporate hrod") === -1) {
+      steps.push({
+        label: "Corporate HROD",
+        approver: getApproverEmailByRole("Corporate HROD", tempRequest) || "Corporate HROD"
+      });
+    }
+  }
+
+  return steps;
 }
 
 function getApprovalStepsForRequest(request, includeFinalSteps = false) {
@@ -1918,7 +1939,7 @@ function completeApprovedRequest(requestID) {
  */
 function getApproverEmailFromMasterList(request, approverRole) {
   try {
-    const sheet = SpreadsheetApp.openById(SHEET_ID).getSheetByName(SHEET_NAMES.ORG_CHART);
+    const sheet = SpreadsheetApp.openById(SHEET_ID).getSheetByName(SHEET_NAMES.OPTIMUM_HC);
     if (!sheet) {
       Logger.log("Optimum Manpower HC sheet not found");
       return null;
@@ -1943,6 +1964,7 @@ function getApproverEmailFromMasterList(request, approverRole) {
       else if (header === "managing director") managingDirectorIdx = j;
       else if (header.indexOf("legal") !== -1) legalTeamIdx = j;
       else if (header.indexOf("corporate") !== -1 && header.indexOf("hrod") !== -1) corpHrodIdx = j;
+      else if (header === "corporate hrod") corpHrodIdx = j;
     }
     
     if (plantHeadIdx < 0 || buHeadIdx < 0) {
