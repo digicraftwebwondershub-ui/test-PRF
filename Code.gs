@@ -811,16 +811,22 @@ function getApprovalStepsForData(requestData, includeFinalSteps = false) {
     }));
   }
 
-  // If includeFinalSteps is true, always append Legal and Corporate HROD if they aren't there
-  // This is primarily for the frontend workflow tracker to show all 6 steps
+  // If includeFinalSteps is true, always append Legal (if Seasonal) and Corporate HROD if they aren't there
+  // This is primarily for the frontend workflow tracker
   if (includeFinalSteps) {
     const labels = steps.map(s => s.label.toLowerCase());
-    if (labels.indexOf("legal team") === -1 && labels.indexOf("legal") === -1) {
-      steps.push({
-        label: "Legal Team",
-        approver: getApproverEmailByRole("Legal Team", tempRequest) || "Legal Team"
-      });
+
+    // Only include Legal Team if it's Seasonal
+    if (requestData.requestType === "Seasonal") {
+      if (labels.indexOf("legal team") === -1 && labels.indexOf("legal") === -1) {
+        steps.push({
+          label: "Legal Team",
+          approver: getApproverEmailByRole("Legal Team", tempRequest) || "Legal Team"
+        });
+      }
     }
+
+    // Always ensure Corporate HROD is at the end
     if (labels.indexOf("corporate hrod") === -1) {
       steps.push({
         label: "Corporate HROD",
@@ -1318,6 +1324,14 @@ function getRequestByID(requestID) {
  * Approval routing configuration
  */
 function getApprovalRoute(requestType, category) {
+  const route = ["Plant Head", "BU Head"];
+
+  if (requestType === "Seasonal") {
+    route.push("Legal Team");
+  }
+  
+  route.push("Corporate HROD");
+  return route;
   if (requestType === "Replacement") {
     return ["Plant Head", "Legal Team", "Corporate HROD"];
   } else if (requestType === "Seasonal") {
@@ -1693,7 +1707,7 @@ function submitForStep5Approval(requestID) {
   const rowNumber = request.rowNumber;
   
   // Get Step 5 approval chain (Legal Team, Corporate HROD)
-  const step5Chain = getStep5ApprovalChain();
+  const step5Chain = getStep5ApprovalChain(request);
   if (!step5Chain || step5Chain.length === 0) {
     return { success: false, message: "Step 5 approval chain not configured" };
   }
@@ -1766,8 +1780,13 @@ function submitForStep5Approval(requestID) {
  * Get Step 5 approval chain (only Legal + Corporate HROD)
  * Note: Uses naming consistent with getApprovalRoute
  */
-function getStep5ApprovalChain() {
-  return ["Legal Team", "Corporate HROD"];
+function getStep5ApprovalChain(request) {
+  const chain = [];
+  if (request && request.requestType === "Seasonal") {
+    chain.push("Legal Team");
+  }
+  chain.push("Corporate HROD");
+  return chain;
 }
 
 /**
