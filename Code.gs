@@ -804,7 +804,7 @@ function getApprovalStepsForData(requestData, includeFinalSteps = false) {
     const route = requestData.gap <= 0
       ? ["Plant Head", "BU Head"]
       : getApprovalRoute(getNormalizedRequestType(requestData), requestData.category);
-
+    
     steps = route.map(label => ({
       label: label,
       approver: getApproverEmailByRole(label, tempRequest) || label
@@ -1332,6 +1332,19 @@ function getApprovalRoute(requestType, category) {
   
   route.push("Corporate HROD");
   return route;
+  if (requestType === "Replacement") {
+    return ["Plant Head", "Legal Team", "Corporate HROD"];
+  } else if (requestType === "Seasonal") {
+    return category === "Production" 
+      ? ["Plant Head", "BU Head", "Legal Team", "Corporate HROD"]
+      : ["Plant Head", "BU Head", "Legal Team", "Corporate HROD"];
+  } else if (requestType === "Regular") {
+    return category === "Production"
+      ? ["Plant Head", "BU Head", "Legal Team", "Corporate HROD"]
+      : ["Plant Head", "BU Head", "Legal Team", "Corporate HROD"];
+  }
+  
+  return ["Plant Head", "BU Head", "Legal Team", "Corporate HROD"];
 }
 
 /**
