@@ -2415,17 +2415,13 @@
 
         function renderApprovalTracker(request) {
             const status = normalizeStatus(request.status, 'Pending');
-            const isInStep3 = status.indexOf('Step 3') !== -1;
-            const isInStep4 = status.indexOf('Step 4') !== -1;
             const isInStepsOrCompleted = status.indexOf('Step') !== -1 || status === 'Sourcing In Progress';
             const isSeasonal = (request.requestType || '').toString().trim() === 'Seasonal';
             
-            // Build dynamic steps list
+            // Build dynamic steps list - Only actual approval stages
             const stepsList = [
                 { phase: 1, step: 'Step 1', label: 'Plant Head Approval', role: 'Plant Head', type: 'approval' },
-                { phase: 2, step: 'Step 2', label: 'BU Head Approval', role: 'BU Head', type: 'approval' },
-                { phase: 3, step: 'Step 3', label: 'Type Selection', role: 'Requestor', type: 'action' },
-                { phase: 4, step: 'Step 4', label: 'Review & Submit', role: 'Requestor', type: 'action' }
+                { phase: 2, step: 'Step 2', label: 'BU Head Approval', role: 'BU Head', type: 'approval' }
             ];
 
             // Conditionally add Legal Team for Seasonal requests
@@ -2469,141 +2465,37 @@
                 return null;
             };
             
-            const workflowSteps = stepsList.map(step => {
+            const workflowSteps = stepsList.map((step, index) => {
                 let state = 'pending';
                 let stateLabel = 'Pending';
                 
-                // Step 5/6 markers
-                const isInStep5 = (nextApproverLower.indexOf('legal') !== -1 || nextApproverLower.indexOf('corporate') !== -1 || legalAppr || corpHrodAppr);
-                const isInStep6 = (status === 'Sourcing In Progress' || recruitNotif);
-
-                // Check global status first
+                // Determine state based on status and currentIndex
                 if (status === 'Disapproved') {
                     state = 'disapproved';
                     stateLabel = 'Disapproved';
-                } else if (status === 'On Hold') {
+                } else if (status === 'On Hold' && currentIndex === index) {
                     state = 'on_hold';
                     stateLabel = 'On Hold';
-                } else if (status === 'Approved' || isInStepsOrCompleted || isInStep5 || isInStep6) {
-                    // Past initial approvals
-                    if (step.phase === 1 || step.phase === 2) {
-                        state = 'completed';
-                        stateLabel = 'Approved';
-                    }
-                    // If we've reached Step 5 or 6, Steps 3 and 4 must be completed
-                    if ((isInStep5 || isInStep6) && (step.phase === 3 || step.phase === 4)) {
-                        state = 'completed';
-                        stateLabel = 'Complete';
-                    }
-                }
-                
-                // Step 1: Plant Head Approval
-                if (step.phase === 1) {
-                    if (!status.match(/disapproved|on hold/i)) {
-                        if (plantHeadAppr) {
-                            const apprState = getApprovalState(plantHeadAppr);
-                            if (apprState) {
-                                state = apprState.state;
-                                stateLabel = apprState.label;
-                            }
-                        } else if (currentIndex === 0 || nextApproverLower.indexOf('plant') !== -1) {
-                            state = 'current';
-                            stateLabel = 'Awaiting Plant Head';
-                        } else if (currentIndex > 0 || nextApproverLower.indexOf('bu') !== -1 || buHeadAppr || status === 'Approved' || isInStepsOrCompleted) {
-                            state = 'completed';
-                            stateLabel = 'Approved';
-                        }
-                    }
-                }
-                // Step 2: BU Head Approval
-                else if (step.phase === 2) {
-                    if (!status.match(/disapproved|on hold/i)) {
-                        const step2Approver = approvalSteps[1];
-                        const isStep2Current = currentIndex === 1 || (step2Approver && (step2Approver.label.toLowerCase().indexOf('bu') !== -1 || step2Approver.label.toLowerCase().indexOf('manufacturing') !== -1) && nextApproverLower === (step2Approver.approver || '').toLowerCase().trim());
-                        
-                        if (buHeadAppr) {
-                            const apprState = getApprovalState(buHeadAppr);
-                            if (apprState) {
-                                state = apprState.state;
-                                stateLabel = apprState.label;
-                            }
-                        } else if (isStep2Current || nextApproverLower.indexOf('bu') !== -1) {
-                            state = 'current';
-                            stateLabel = 'Awaiting BU Head';
-                        } else if (plantHeadAppr.indexOf('disapproved') !== -1 || plantHeadAppr.indexOf('hold') !== -1) {
-                            state = 'pending';
-                            stateLabel = 'Pending';
-                        } else if ((plantHeadAppr && !buHeadAppr && status === 'Approved') || currentIndex > 1) {
-                            state = 'completed';
-                            stateLabel = 'Approved';
-                        }
-                    }
-                }
-                // Step 3: Type Selection
-                else if (step.phase === 3) {
-                    if (isInStep3) {
-                        state = 'current';
-                        stateLabel = 'In Progress';
-                    } else if (typeSelAppr) {
-                        const apprState = getApprovalState(typeSelAppr);
-                        state = apprState ? apprState.state : 'completed';
-                        stateLabel = apprState ? apprState.label : 'Complete';
-                    } else if (isInStep4 || status === 'Sourcing In Progress') {
-                        state = 'completed';
-                        stateLabel = 'Complete';
-                    } else if (status === 'Approved') {
-                        state = 'pending';
-                        stateLabel = 'Ready';
-                    }
-                }
-                // Step 4: Review & Submit
-                else if (step.phase === 4) {
-                    if (isInStep4) {
-                        state = 'current';
-                        stateLabel = 'In Progress';
-                    } else if (reviewAppr) {
-                        const apprState = getApprovalState(reviewAppr);
-                        state = apprState ? apprState.state : 'completed';
-                        stateLabel = apprState ? apprState.label : 'Complete';
-                    } else if (status === 'Sourcing In Progress' || (legalAppr || corpHrodAppr)) {
-                        state = 'completed';
-                        stateLabel = 'Complete';
-                    }
-                }
-                // Step 5: Legal Team Approval
-                else if (step.phase === 5) {
-                    if (legalAppr) {
-                        const apprState = getApprovalState(legalAppr);
-                        state = apprState ? apprState.state : 'completed';
-                        stateLabel = apprState ? apprState.label : 'Approved';
-                    } else if (nextApproverLower.indexOf('legal') !== -1) {
-                        state = 'current';
-                        stateLabel = 'In Progress';
-                    } else if (corpHrodAppr || status === 'Sourcing In Progress') {
+                } else if (status === 'Sourcing In Progress' || status === 'Completed') {
+                    state = 'completed';
+                    stateLabel = 'Complete';
+                } else if (currentIndex === index) {
+                    state = 'current';
+                    stateLabel = 'In Progress';
+                } else if (currentIndex > index || currentIndex === -1) {
+                    // If currentIndex is -1 but status is not Pending, it's either approved or in Step 3/4
+                    if (status !== 'Pending' || plantHeadAppr || buHeadAppr) {
                         state = 'completed';
                         stateLabel = 'Approved';
                     }
                 }
-                // Step 5.5: Corporate HROD Approval
-                else if (step.phase === 5.5) {
-                    if (corpHrodAppr) {
-                        const apprState = getApprovalState(corpHrodAppr);
-                        state = apprState ? apprState.state : 'completed';
-                        stateLabel = apprState ? apprState.label : 'Approved';
-                    } else if (nextApproverLower.indexOf('corporate') !== -1) {
-                        state = 'current';
-                        stateLabel = 'In Progress';
-                    } else if (status === 'Sourcing In Progress') {
-                        state = 'completed';
-                        stateLabel = 'Approved';
-                    }
-                }
-                // Step 6: Recruitment Notification
-                else if (step.phase === 6) {
-                    if (status === 'Sourcing In Progress' || recruitNotif) {
-                        state = 'completed';
-                        stateLabel = 'Active';
-                    }
+
+                // Refine labels for specific roles
+                if (state === 'current') {
+                    if (step.role === 'Plant Head') stateLabel = 'Awaiting Plant Head';
+                    else if (step.role === 'BU Head') stateLabel = 'Awaiting BU Head';
+                    else if (step.role === 'Legal Team') stateLabel = 'Awaiting Legal Team';
+                    else if (step.role === 'Corporate HROD') stateLabel = 'Awaiting Corporate HROD';
                 }
                 
                 return {

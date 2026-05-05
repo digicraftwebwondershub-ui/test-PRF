@@ -743,18 +743,20 @@ function getOrgApprovalSteps(division, group, department, section, unit, line) {
     if (exactSteps.length) return exactSteps;
   }
 
+  // Fallback 1: Match by Department/Section if Unit/Line doesn't match
   if (structure[division] && 
       structure[division].groups && structure[division].groups[group] && 
       structure[division].groups[group].departments && structure[division].groups[group].departments[department] &&
       structure[division].groups[group].departments[department].sections && structure[division].groups[group].departments[department].sections[section]) {
-    const sectionData = structure[division].groups[group].departments[department].sections[section].units;
-    for (const unitKey in sectionData) {
-      const linesData = sectionData[unitKey].lines;
-      if (linesData) {
-        for (const lineKey in linesData) {
-          const sectionSteps = buildSteps(linesData[lineKey]);
-          if (sectionSteps.length) return sectionSteps;
-        }
+    const sectionObj = structure[division].groups[group].departments[department].sections[section];
+    const unitsObj = sectionObj.units;
+
+    // Try to find ANY valid approver in this section
+    for (const unitKey in unitsObj) {
+      const linesObj = unitsObj[unitKey].lines;
+      for (const lineKey in linesObj) {
+        const steps = buildSteps(linesObj[lineKey]);
+        if (steps.length) return steps;
       }
     }
   }
@@ -770,6 +772,19 @@ function getNormalizedRequestType(requestData) {
 }
 
 function getApprovalStepsForData(requestData, includeFinalSteps = false) {
+  // If stored approval chain exists and contains emails, prioritize it
+  if (requestData.approvalChain && requestData.approvalChain.indexOf('@') !== -1) {
+    const chainParts = requestData.approvalChain.split(',').map(s => s.trim());
+    const route = requestData.gap <= 0
+      ? ["Plant Head", "BU Head"]
+      : getApprovalRoute(requestData.requestType, requestData.category);
+
+    return route.map((label, idx) => ({
+      label: label,
+      approver: chainParts[idx] || label
+    }));
+  }
+
   const orgSteps = getOrgApprovalSteps(
     requestData.division,
     requestData.group,
@@ -804,7 +819,7 @@ function getApprovalStepsForData(requestData, includeFinalSteps = false) {
     const route = requestData.gap <= 0
       ? ["Plant Head", "BU Head"]
       : getApprovalRoute(getNormalizedRequestType(requestData), requestData.category);
-    
+
     steps = route.map(label => ({
       label: label,
       approver: getApproverEmailByRole(label, tempRequest) || label
@@ -849,7 +864,8 @@ function getApprovalStepsForRequest(request, includeFinalSteps = false) {
     requestType: request.requestType,
     category: request.category,
     positions: request.positions,
-    gap: request.gap
+    gap: request.gap,
+    approvalChain: request.approvalChain
   }, includeFinalSteps);
 }
 
@@ -1332,19 +1348,6 @@ function getApprovalRoute(requestType, category) {
   
   route.push("Corporate HROD");
   return route;
-  if (requestType === "Replacement") {
-    return ["Plant Head", "Legal Team", "Corporate HROD"];
-  } else if (requestType === "Seasonal") {
-    return category === "Production" 
-      ? ["Plant Head", "BU Head", "Legal Team", "Corporate HROD"]
-      : ["Plant Head", "BU Head", "Legal Team", "Corporate HROD"];
-  } else if (requestType === "Regular") {
-    return category === "Production"
-      ? ["Plant Head", "BU Head", "Legal Team", "Corporate HROD"]
-      : ["Plant Head", "BU Head", "Legal Team", "Corporate HROD"];
-  }
-  
-  return ["Plant Head", "BU Head", "Legal Team", "Corporate HROD"];
 }
 
 /**
