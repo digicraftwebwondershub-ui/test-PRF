@@ -815,7 +815,7 @@ function getApprovalStepsForData(requestData, includeFinalSteps = false) {
   // This is primarily for the frontend workflow tracker
   if (includeFinalSteps) {
     const labels = steps.map(s => s.label.toLowerCase());
-
+    
     // Only include Legal Team if it's Seasonal
     if (requestData.requestType === "Seasonal") {
       if (labels.indexOf("legal team") === -1 && labels.indexOf("legal") === -1) {
@@ -825,7 +825,7 @@ function getApprovalStepsForData(requestData, includeFinalSteps = false) {
         });
       }
     }
-
+    
     // Always ensure Corporate HROD is at the end
     if (labels.indexOf("corporate hrod") === -1) {
       steps.push({
@@ -1325,26 +1325,13 @@ function getRequestByID(requestID) {
  */
 function getApprovalRoute(requestType, category) {
   const route = ["Plant Head", "BU Head"];
-
+  
   if (requestType === "Seasonal") {
     route.push("Legal Team");
   }
   
   route.push("Corporate HROD");
   return route;
-  if (requestType === "Replacement") {
-    return ["Plant Head", "Legal Team", "Corporate HROD"];
-  } else if (requestType === "Seasonal") {
-    return category === "Production" 
-      ? ["Plant Head", "BU Head", "Legal Team", "Corporate HROD"]
-      : ["Plant Head", "BU Head", "Legal Team", "Corporate HROD"];
-  } else if (requestType === "Regular") {
-    return category === "Production"
-      ? ["Plant Head", "BU Head", "Legal Team", "Corporate HROD"]
-      : ["Plant Head", "BU Head", "Legal Team", "Corporate HROD"];
-  }
-  
-  return ["Plant Head", "BU Head", "Legal Team", "Corporate HROD"];
 }
 
 /**
