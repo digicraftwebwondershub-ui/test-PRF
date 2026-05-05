@@ -2469,8 +2469,25 @@
                 let state = 'pending';
                 let stateLabel = 'Pending';
                 
-                // Determine state based on status and currentIndex
-                if (status === 'Disapproved') {
+                // Determine state based on status and explicit approval fields
+                const checkApprovalState = (val) => {
+                    const v = (val || '').toLowerCase().trim();
+                    if (v.indexOf('approved') === 0) return { state: 'completed', label: 'Approved' };
+                    if (v.indexOf('disapproved') === 0) return { state: 'disapproved', label: 'Disapproved' };
+                    if (v.indexOf('hold') !== -1) return { state: 'on_hold', label: 'On Hold' };
+                    return null;
+                };
+
+                let explicitState = null;
+                if (step.role === 'Plant Head') explicitState = checkApprovalState(plantHeadAppr);
+                else if (step.role === 'BU Head') explicitState = checkApprovalState(buHeadAppr);
+                else if (step.role === 'Legal Team') explicitState = checkApprovalState(legalAppr);
+                else if (step.role === 'Corporate HROD') explicitState = checkApprovalState(corpHrodAppr);
+
+                if (explicitState) {
+                    state = explicitState.state;
+                    stateLabel = explicitState.label;
+                } else if (status === 'Disapproved') {
                     state = 'disapproved';
                     stateLabel = 'Disapproved';
                 } else if (status === 'On Hold' && currentIndex === index) {
@@ -2482,12 +2499,6 @@
                 } else if (currentIndex === index) {
                     state = 'current';
                     stateLabel = 'In Progress';
-                } else if (currentIndex > index || currentIndex === -1) {
-                    // If currentIndex is -1 but status is not Pending, it's either approved or in Step 3/4
-                    if (status !== 'Pending' || plantHeadAppr || buHeadAppr) {
-                        state = 'completed';
-                        stateLabel = 'Approved';
-                    }
                 }
 
                 // Refine labels for specific roles

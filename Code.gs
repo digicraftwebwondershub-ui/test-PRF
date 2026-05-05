@@ -775,9 +775,7 @@ function getApprovalStepsForData(requestData, includeFinalSteps = false) {
   // If stored approval chain exists and contains emails, prioritize it
   if (requestData.approvalChain && requestData.approvalChain.indexOf('@') !== -1) {
     const chainParts = requestData.approvalChain.split(',').map(s => s.trim());
-    const route = requestData.gap <= 0
-      ? ["Plant Head", "BU Head"]
-      : getApprovalRoute(requestData.requestType, requestData.category);
+    const route = getApprovalRoute(requestData.requestType, requestData.category);
 
     return route.map((label, idx) => ({
       label: label,
@@ -816,9 +814,7 @@ function getApprovalStepsForData(requestData, includeFinalSteps = false) {
     }));
   } else {
     // Otherwise fallback to getApprovalRoute
-    const route = requestData.gap <= 0
-      ? ["Plant Head", "BU Head"]
-      : getApprovalRoute(getNormalizedRequestType(requestData), requestData.category);
+    const route = getApprovalRoute(requestData.requestType, requestData.category);
 
     steps = route.map(label => ({
       label: label,
@@ -1409,20 +1405,11 @@ function approveRequest(requestID, action, comments) {
   if (action === "Approve") {
     let nextIndex = currentIndex < 0 ? 0 : currentIndex;
 
-    // Process current level and any identical subsequent levels in the chain
+    // Process current level ONLY - No cascading auto-approval for same emails
     if (nextIndex < approvalChain.length) {
-      const currentApproverValue = approvalChain[nextIndex];
-      const currentLabelValue = approvalSteps[nextIndex] ? approvalSteps[nextIndex].label : "";
-      
-      do {
-        approvedLevels.push(approvalSteps[nextIndex] ? approvalSteps[nextIndex].label : approvalChain[nextIndex]);
-        remarkIndexesToUpdate.push(nextIndex);
-        nextIndex++;
-      } while (nextIndex < approvalChain.length && 
-               (approvalChain[nextIndex] === currentApproverValue || 
-                (approvalSteps[nextIndex] && approvalSteps[nextIndex].label === currentLabelValue) ||
-                approvalChain[nextIndex] === request.currentApprover ||
-                (approvalSteps[nextIndex] && approvalSteps[nextIndex].label === request.currentApprover)));
+      approvedLevels.push(approvalSteps[nextIndex] ? approvalSteps[nextIndex].label : approvalChain[nextIndex]);
+      remarkIndexesToUpdate.push(nextIndex);
+      nextIndex++;
     }
 
     actedLevels = approvedLevels.length > 0 ? approvedLevels.slice() : [currentLevel];
