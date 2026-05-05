@@ -727,7 +727,6 @@ function getOrgApprovalSteps(division, group, department, section, unit, line) {
     const steps = [
       { label: "Plant Head", approver: (row.plantHead || "").toString().trim() },
       { label: "BU Head", approver: (row.buHead || "").toString().trim() },
-      { label: "Managing Director", approver: (row.managingDirector || "").toString().trim() },
       { label: "Legal Team", approver: (row.legalTeam || "").toString().trim() },
       { label: "Corporate HROD", approver: (row.corporateHrod || "").toString().trim() }
     ];
@@ -1323,15 +1322,15 @@ function getApprovalRoute(requestType, category) {
     return ["Plant Head", "Legal Team", "Corporate HROD"];
   } else if (requestType === "Seasonal") {
     return category === "Production" 
-      ? ["Plant Head", "Manufacturing Director", "BU Head", "Legal Team", "Corporate HROD"]
+      ? ["Plant Head", "BU Head", "Legal Team", "Corporate HROD"]
       : ["Plant Head", "BU Head", "Legal Team", "Corporate HROD"];
   } else if (requestType === "Regular") {
     return category === "Production"
-      ? ["Plant Head", "Manufacturing Director", "BU Head", "Legal Team", "Corporate HROD"]
+      ? ["Plant Head", "BU Head", "Legal Team", "Corporate HROD"]
       : ["Plant Head", "BU Head", "Legal Team", "Corporate HROD"];
   }
   
-  return ["Plant Head"];
+  return ["Plant Head", "BU Head", "Legal Team", "Corporate HROD"];
 }
 
 /**
@@ -1998,17 +1997,12 @@ function getApproverEmailFromMasterList(request, approverRole) {
         } else if (normalizedRole.indexOf("bu") !== -1 || normalizedRole.indexOf("business") !== -1) {
           // BU Head
           approverEmail = (data[i][buHeadIdx] || "").toString().trim();
-        } else if (normalizedRole.indexOf("managing") !== -1) {
-          // Managing Director
-          approverEmail = (data[i][managingDirectorIdx] || "").toString().trim();
         } else if (normalizedRole.indexOf("corporate") !== -1 || normalizedRole.indexOf("hrod") !== -1) {
           // Corporate HROD
           approverEmail = corpHrodIdx >= 0 ? (data[i][corpHrodIdx] || "").toString().trim() : "";
-          if (!approverEmail) approverEmail = (data[i][managingDirectorIdx] || "").toString().trim();
         } else if (normalizedRole.indexOf("legal") !== -1) {
           // Legal Team
           approverEmail = legalTeamIdx >= 0 ? (data[i][legalTeamIdx] || "").toString().trim() : "";
-          if (!approverEmail) approverEmail = (data[i][managingDirectorIdx] || "").toString().trim();
         }
         
         if (approverEmail) {
@@ -2056,8 +2050,7 @@ function getApproverEmailByRole(roleLabel, request = null) {
     "corporate hrod": "Corporate HROD",
     "corporate_hrod": "Corporate HROD",
     "plant head": "Plant Head",
-    "bu head": "BU Head",
-    "managing director": "Managing Director"
+    "bu head": "BU Head"
   };
   
   const normalizedInput = trimmedRole.toLowerCase();
