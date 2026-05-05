@@ -2197,7 +2197,6 @@
         function getApprovalRemark(request, step, index) {
             if ((step && step.label === 'Plant Head') || index === 0) return request.remarks1 || '';
             if ((step && step.label === 'BU Head') || index === 1) return request.remarks2 || '';
-            if ((step && step.label === 'Managing Director') || index === 2) return request.remarks3 || '';
             return '';
         }
 
@@ -2210,7 +2209,7 @@
         }
 
         function getLatestRemark(request) {
-            return [request.remarks3, request.remarks2, request.remarks1, request.approverNotes]
+            return [request.remarks2, request.remarks1, request.approverNotes]
                 .find(value => value && value.toString().trim()) || '';
         }
 
@@ -2249,6 +2248,7 @@
         function getNextStepsInfo(request) {
             const status = normalizeStatus(request.status, 'Pending');
             const currentIndex = getCurrentApprovalStepIndex(request);
+            const currentApprover = (request.currentApprover || '').toString().trim();
             
             if (status === 'Approved') {
                 return {
@@ -2292,17 +2292,12 @@
                 };
             }
             
-            // Status is Pending (in approval workflow)
-            if (currentIndex >= 0 && currentIndex + 1 < request.approvalSteps.length) {
-                const nextStep = request.approvalSteps[currentIndex + 1];
+            // Status is Pending or On Hold (in approval workflow)
+            if (currentIndex >= 0) {
+                const currentStep = request.approvalSteps[currentIndex];
                 return {
                     displayed: true,
-                    text: `➡️ <strong>Next:</strong> Awaiting review from <strong>${nextStep.label}</strong> (${nextStep.approver || 'N/A'})`
-                };
-            } else if (currentIndex >= 0 && currentIndex + 1 === request.approvalSteps.length) {
-                return {
-                    displayed: true,
-                    text: '✅ <strong>Final Step:</strong> Currently with the last approver. Completion is near.'
+                    text: `➡️ <strong>Next:</strong> Awaiting review from <strong>${currentStep.label}</strong> (${currentStep.approver || 'N/A'})`
                 };
             } else if (request.approvalSteps && request.approvalSteps.length > 0) {
                 return {
