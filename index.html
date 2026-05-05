@@ -2414,21 +2414,28 @@
         }
 
         function renderApprovalTracker(request) {
-            // Build the 6-step workflow tracker
             const status = normalizeStatus(request.status, 'Pending');
             const isInStep3 = status.indexOf('Step 3') !== -1;
             const isInStep4 = status.indexOf('Step 4') !== -1;
             const isInStepsOrCompleted = status.indexOf('Step') !== -1 || status === 'Sourcing In Progress';
+            const isSeasonal = (request.requestType || '').toString().trim() === 'Seasonal';
             
-            // Initialize all 6 steps
-            const sixSteps = [
+            // Build dynamic steps list
+            const stepsList = [
                 { phase: 1, step: 'Step 1', label: 'Plant Head Approval', role: 'Plant Head', type: 'approval' },
                 { phase: 2, step: 'Step 2', label: 'BU Head Approval', role: 'BU Head', type: 'approval' },
                 { phase: 3, step: 'Step 3', label: 'Type Selection', role: 'Requestor', type: 'action' },
-                { phase: 4, step: 'Step 4', label: 'Review & Submit', role: 'Requestor', type: 'action' },
-                { phase: 5, step: 'Step 5', label: 'Final Approval (Legal & HROD)', role: 'Legal Team + Corporate HROD', type: 'approval' },
-                { phase: 6, step: 'Step 6', label: 'Sourcing In Progress', role: 'Recruitment', type: 'system' }
+                { phase: 4, step: 'Step 4', label: 'Review & Submit', role: 'Requestor', type: 'action' }
             ];
+
+            // Conditionally add Legal Team for Seasonal requests
+            if (isSeasonal) {
+                stepsList.push({ phase: 5, step: 'Step 5', label: 'Legal Team Approval', role: 'Legal Team', type: 'approval' });
+            }
+
+            // Always add Corporate HROD and Sourcing
+            stepsList.push({ phase: 5.5, step: 'Step 5.5', label: 'Corporate HROD Approval', role: 'Corporate HROD', type: 'approval' });
+            stepsList.push({ phase: 6, step: 'Step 6', label: 'Sourcing In Progress', role: 'Recruitment', type: 'system' });
             
             // Determine state of each step based on approval columns
             const currentApproverValue = (request.currentApprover || '').toLowerCase().trim();
@@ -2462,15 +2469,12 @@
                 return null;
             };
             
-            const workflowSteps = sixSteps.map(step => {
+            const workflowSteps = stepsList.map(step => {
                 let state = 'pending';
                 let stateLabel = 'Pending';
                 
-                // Determine if we are in Step 5 or Step 6 based on status or approval columns
-                // or if the current index in the approval chain has reached those roles
-                const step5Roles = ['legal', 'corporate'];
-                const isInStep5 = (nextApproverLower.indexOf('legal') !== -1 || nextApproverLower.indexOf('corporate') !== -1 || legalAppr || corpHrodAppr || 
-                                  (currentIndex >= 0 && step5Roles.some(role => (approvalSteps[currentIndex].label || '').toLowerCase().indexOf(role) !== -1)));
+                // Step 5/6 markers
+                const isInStep5 = (nextApproverLower.indexOf('legal') !== -1 || nextApproverLower.indexOf('corporate') !== -1 || legalAppr || corpHrodAppr);
                 const isInStep6 = (status === 'Sourcing In Progress' || recruitNotif);
 
                 // Check global status first
@@ -2566,27 +2570,32 @@
                         stateLabel = 'Complete';
                     }
                 }
-                // Step 5: Final Approval (Legal & Corporate HROD)
+                // Step 5: Legal Team Approval
                 else if (step.phase === 5) {
-                    if (legalAppr && !corpHrodAppr) {
+                    if (legalAppr) {
                         const apprState = getApprovalState(legalAppr);
-                        if (apprState && (apprState.state === 'disapproved' || apprState.state === 'on_hold')) {
-                            state = apprState.state;
-                            stateLabel = apprState.label;
-                        } else {
-                            state = 'current';
-                            stateLabel = 'Legal Approved';
-                        }
-                    } else if (corpHrodAppr) {
+                        state = apprState ? apprState.state : 'completed';
+                        stateLabel = apprState ? apprState.label : 'Approved';
+                    } else if (nextApproverLower.indexOf('legal') !== -1) {
+                        state = 'current';
+                        stateLabel = 'In Progress';
+                    } else if (corpHrodAppr || status === 'Sourcing In Progress') {
+                        state = 'completed';
+                        stateLabel = 'Approved';
+                    }
+                }
+                // Step 5.5: Corporate HROD Approval
+                else if (step.phase === 5.5) {
+                    if (corpHrodAppr) {
                         const apprState = getApprovalState(corpHrodAppr);
                         state = apprState ? apprState.state : 'completed';
-                        stateLabel = apprState ? apprState.label : 'Complete';
-                    } else if (nextApproverLower.indexOf('legal') !== -1 || nextApproverLower.indexOf('corporate') !== -1) {
+                        stateLabel = apprState ? apprState.label : 'Approved';
+                    } else if (nextApproverLower.indexOf('corporate') !== -1) {
                         state = 'current';
                         stateLabel = 'In Progress';
                     } else if (status === 'Sourcing In Progress') {
                         state = 'completed';
-                        stateLabel = 'Complete';
+                        stateLabel = 'Approved';
                     }
                 }
                 // Step 6: Recruitment Notification
@@ -2630,10 +2639,12 @@
             const nextSteps = getNextStepsInfo(request);
             const nextStepsHtml = nextSteps.displayed ? `<div class="tracker-next-steps">${nextSteps.text}</div>` : '';
 
+            const totalStepsCount = workflowSteps.length;
+
             return `
                 <div class="info-card">
                     <div class="card-header">
-                        <h4>🧭 6-Step Workflow Tracker</h4>
+                        <h4>🧭 ${totalStepsCount}-Step Workflow Tracker</h4>
                     </div>
                     <div class="card-body">
                         <div class="tracker-steps">${trackerHtml}</div>
