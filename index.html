@@ -1339,6 +1339,258 @@
         .mb-3 { margin-bottom: 1.5rem; }
         .text-center { text-align: center; }
         .text-muted { color: var(--gray-500); }
+
+        /* New Approval Card Styles */
+        .approval-section-container {
+            background: white;
+            border-radius: var(--radius-lg);
+            overflow: hidden;
+            box-shadow: var(--shadow-md);
+            margin-bottom: 2rem;
+            border: 1px solid var(--gray-200);
+        }
+
+        .approval-section-header {
+            background: #3b82f6; /* Modern Blue */
+            color: white;
+            padding: 1.25rem 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-size: 1.15rem;
+            font-weight: 600;
+        }
+
+        .approval-card {
+            background: #fffcfc; /* Very light red/white */
+            border: 1px solid #fee2e2;
+            border-radius: var(--radius-lg);
+            padding: 1.75rem;
+            margin: 1.5rem;
+        }
+
+        .approval-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 1rem;
+        }
+
+        .approval-card-title {
+            font-size: 1.35rem;
+            font-weight: 700;
+            color: var(--gray-900);
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .exceptional-badge {
+            background: #fee2e2;
+            color: #ef4444;
+            padding: 0.35rem 0.85rem;
+            border-radius: 999px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            border: 1px solid #fecaca;
+            display: flex;
+            align-items: center;
+            gap: 0.35rem;
+            text-transform: uppercase;
+            letter-spacing: 0.02em;
+        }
+
+        .approval-card-meta {
+            font-size: 0.9rem;
+            color: var(--gray-600);
+            margin-bottom: 1.75rem;
+        }
+
+        .approval-card-meta div {
+            margin-bottom: 0.25rem;
+        }
+
+        .approval-card-meta strong {
+            color: var(--gray-900);
+        }
+
+        .details-grid-card {
+            border: 1px solid var(--gray-200);
+            border-radius: var(--radius);
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            background: white;
+        }
+
+        .details-grid-title {
+            font-size: 0.95rem;
+            font-weight: 700;
+            color: var(--gray-800);
+            margin-bottom: 1.25rem;
+        }
+
+        .details-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.25rem;
+        }
+
+        .details-item {
+            font-size: 0.9rem;
+        }
+
+        .details-label {
+            color: var(--gray-500);
+            margin-right: 0.5rem;
+        }
+
+        .details-value {
+            font-weight: 700;
+            color: var(--gray-900);
+        }
+
+        .gap-analysis-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1.25rem;
+        }
+
+        .gap-box {
+            padding: 1.25rem;
+            border-radius: 10px;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .gap-box-label {
+            font-size: 0.72rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .gap-box-value {
+            font-size: 1.75rem;
+            font-weight: 800;
+        }
+
+        .gap-box.optimum { background: #fff7ed; color: #ea580c; border: 1px solid #ffedd5; }
+        .gap-box.actual { background: #eff6ff; color: #2563eb; border: 1px solid #dbeafe; }
+        .gap-box.gap { background: #fef2f2; color: #dc2626; border: 1px solid #fee2e2; }
+        .gap-box.requested { background: #faf5ff; color: #9333ea; border: 1px solid #f3e8ff; }
+
+        .justification-alert {
+            background: #fffbeb;
+            border: 1px solid #fef3c7;
+            border-radius: var(--radius);
+            padding: 1.25rem 1.5rem;
+            margin-bottom: 1.75rem;
+            display: flex;
+            gap: 1rem;
+        }
+
+        .justification-icon {
+            font-size: 1.25rem;
+            margin-top: 0.15rem;
+        }
+
+        .justification-content h4 {
+            font-size: 0.95rem;
+            font-weight: 700;
+            color: #92400e;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .justification-content p {
+            font-size: 0.9rem;
+            color: #b45309;
+            line-height: 1.6;
+        }
+
+        .approval-actions-footer {
+            display: flex;
+            gap: 1.25rem;
+            margin-top: 2rem;
+        }
+
+        .btn-approve-forward {
+            background: #059669;
+            color: white;
+            flex: 2;
+            justify-content: center;
+            border-radius: 14px;
+            font-weight: 700;
+            padding: 1rem;
+            font-size: 1rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+
+        .btn-approve-forward:hover {
+            background: #047857;
+            transform: translateY(-1px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+
+        .btn-reject-request {
+            background: #dc2626;
+            color: white;
+            flex: 2;
+            justify-content: center;
+            border-radius: 14px;
+            font-weight: 700;
+            padding: 1rem;
+            font-size: 1rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+
+        .btn-reject-request:hover {
+            background: #b91c1c;
+            transform: translateY(-1px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+
+        .btn-full-details {
+            background: white;
+            color: var(--gray-700);
+            border: 1px solid var(--gray-300);
+            flex: 1;
+            justify-content: center;
+            border-radius: 14px;
+            font-weight: 600;
+            padding: 1rem;
+            font-size: 0.95rem;
+        }
+
+        .btn-full-details:hover {
+            background: var(--gray-50);
+            border-color: var(--gray-400);
+        }
+
+        @media (max-width: 1024px) {
+            .details-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            .gap-analysis-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 640px) {
+            .details-grid {
+                grid-template-columns: 1fr;
+            }
+            .gap-analysis-grid {
+                grid-template-columns: 1fr;
+            }
+            .approval-actions-footer {
+                flex-direction: column;
+            }
+        }
     </style>
 </head>
 <body>
@@ -1456,12 +1708,13 @@
                 <div class="header">
                     <div>
                         <h1 class="page-title">Approvals</h1>
-                        <p class="page-subtitle">Pending and reviewed requests assigned to you</p>
+                        <p class="page-subtitle">Review and approve exceptional manpower requests</p>
                     </div>
                 </div>
 
                 <div id="approvalFilters" class="filter-pills"></div>
-                <div id="pendingApprovalsContainer"></div>
+                <div id="approvalsListNew" class="approvals-list-new"></div>
+                <div id="pendingApprovalsContainer" class="hidden"></div>
             </div>
 
             <!-- CREATE REQUEST TAB -->
@@ -2117,7 +2370,7 @@
         }
 
         function renderApprovalList() {
-            const container = document.getElementById('pendingApprovalsContainer');
+            const container = document.getElementById('approvalsListNew');
             if (!container) return;
 
             if (!appState.pendingApprovals.length) {
@@ -2143,47 +2396,146 @@
                 return;
             }
 
-            container.innerHTML = approvals.map(req => {
+            // In the image, it's "Pending Exceptional Requests (2)"
+            // We'll show a section for the current filter
+            const count = approvals.length;
+            const filterLabel = appState.approvalFilter === 'Pending' ? 'Pending Exceptional Requests' :
+                               (appState.approvalFilter === 'All' ? 'Approvals' : `${appState.approvalFilter} Requests`);
+
+            let html = `
+                <div class="approval-section-container">
+                    <div class="approval-section-header">
+                        <span style="font-size: 1.25rem;">📄</span>
+                        <span>${filterLabel} (${count})</span>
+                    </div>
+            `;
+
+            html += approvals.map(req => {
                 const manpowerValues = getRequestManpowerValues(req);
-                const reviewState = normalizeStatus(req.reviewState || req.status, 'Pending');
-                const reviewStateClass = getStatusClass(reviewState);
-                const matchedLevels = req.matchedLevels && req.matchedLevels.length
-                    ? req.matchedLevels.join(' / ')
-                    : (req.currentApprover || '-');
+                const manpowerData = req.manpowerData || {};
+                const isExceptional = manpowerData.isExceptional;
+                const requestedHeadcount = (req.positions || []).reduce((sum, p) => sum + (parseInt(p.headcount) || 0), 0);
+
+                // Determine next approver for the button label
+                let nextApproverLabel = "Next Approver";
+                const currentIndex = getCurrentApprovalStepIndex(req);
+                if (req.approvalSteps && currentIndex >= 0 && currentIndex + 1 < req.approvalSteps.length) {
+                    nextApproverLabel = req.approvalSteps[currentIndex + 1].label;
+                } else if (req.status === 'Approved') {
+                    nextApproverLabel = "Step 3 Selection";
+                }
+
+                const createdDate = new Date(req.createdDate || Date.now());
+                const displayDate = isNaN(createdDate.getTime()) ? 'No date' : createdDate.toISOString().split('T')[0];
+
                 return `
-                    <div class="request-item ${reviewStateClass}">
-                        <div class="request-info">
-                            <div class="request-id">${req.requestID}</div>
-                            <div class="request-meta">
-                                <div class="request-meta-item">
-                                    <span>👤</span>
-                                    <span>${req.requestedBy || req.email || '-'}</span>
+                    <div class="approval-card">
+                        <div class="approval-card-header">
+                            <div class="approval-card-title">
+                                ${req.requestID}
+                                ${isExceptional ? `
+                                    <span class="exceptional-badge">
+                                        <span>⚠</span> Exceptional Request
+                                    </span>
+                                ` : ''}
+                            </div>
+                        </div>
+
+                        <div class="approval-card-meta">
+                            <div>Requested by: <strong>${escapeHtml(req.requestedBy || req.email || 'Unknown')}</strong></div>
+                            <div>Date: <strong>${displayDate}</strong></div>
+                        </div>
+
+                        <div class="details-grid-card">
+                            <div class="details-grid-title">Organizational Details</div>
+                            <div class="details-grid">
+                                <div class="details-item"><span class="details-label">Category:</span> <span class="details-value">${escapeHtml(req.category || '-')}</span></div>
+                                <div class="details-item"><span class="details-label">Division:</span> <span class="details-value">${escapeHtml(req.division || '-')}</span></div>
+                                <div class="details-item"><span class="details-label">Group:</span> <span class="details-value">${escapeHtml(req.group || '-')}</span></div>
+                                <div class="details-item"><span class="details-label">Department:</span> <span class="details-value">${escapeHtml(req.department || '-')}</span></div>
+                                <div class="details-item"><span class="details-label">Section:</span> <span class="details-value">${escapeHtml(req.section || '-')}</span></div>
+                                <div class="details-item"><span class="details-label">Unit:</span> <span class="details-value">${escapeHtml(req.unit || '-')}</span></div>
+                                <div class="details-item"><span class="details-label">Line:</span> <span class="details-value">${escapeHtml(req.line || '-')}</span></div>
+                            </div>
+                        </div>
+
+                        <div class="details-grid-card">
+                            <div class="details-grid-title">Manpower Gap Analysis</div>
+                            <div class="gap-analysis-grid">
+                                <div class="gap-box optimum">
+                                    <span class="gap-box-label">Optimum HC</span>
+                                    <span class="gap-box-value">${formatDisplayValue(manpowerValues.optimumHC, '0')}</span>
                                 </div>
-                                <div class="request-meta-item">
-                                    <span>🏢</span>
-                                    <span>${req.department || '-'}</span>
+                                <div class="gap-box actual">
+                                    <span class="gap-box-label">Actual HC</span>
+                                    <span class="gap-box-value">${formatDisplayValue(manpowerValues.actualHC, '0')}</span>
                                 </div>
-                                <div class="request-meta-item">
-                                    <span>🧭</span>
-                                    <span>${matchedLevels}</span>
+                                <div class="gap-box gap">
+                                    <span class="gap-box-label">Gap</span>
+                                    <span class="gap-box-value">${formatDisplayValue(manpowerValues.gap, '0')}</span>
                                 </div>
-                                <div class="request-meta-item">
-                                    <span>📊</span>
-                                    <span>Optimum HC: ${formatDisplayValue(manpowerValues.optimumHC, '-')}</span>
-                                </div>
-                                <div class="request-meta-item">
-                                    <span>👥</span>
-                                    <span>Actual HC: ${formatDisplayValue(manpowerValues.actualHC, '-')}</span>
+                                <div class="gap-box requested">
+                                    <span class="gap-box-label">Requested</span>
+                                    <span class="gap-box-value">+${requestedHeadcount}</span>
                                 </div>
                             </div>
                         </div>
-                        <div class="request-actions">
-                            <span class="badge badge-${reviewStateClass}">${reviewState === 'Approved' ? 'Pre-approved' : reviewState}</span>
-                            <button class="btn btn-primary" onclick="openApprovalModal('${req.requestID}')">${req.canAct ? 'Review' : 'View'}</button>
+
+                        ${req.justification ? `
+                            <div class="justification-alert">
+                                <div class="justification-icon">⚠</div>
+                                <div class="justification-content">
+                                    <h4>Justification for Additional Manpower</h4>
+                                    <p>${escapeHtml(req.justification)}</p>
+                                </div>
+                            </div>
+                        ` : ''}
+
+                        <div class="approval-actions-footer">
+                            ${req.canAct ? `
+                                <button class="btn btn-approve-forward" onclick="quickApprove('${req.requestID}', 'Approve')">
+                                    <span>✓</span> Approve & Forward to ${nextApproverLabel}
+                                </button>
+                                <button class="btn btn-reject-request" onclick="quickApprove('${req.requestID}', 'Disapprove')">
+                                    <span>✕</span> Reject Request
+                                </button>
+                            ` : `
+                                <div class="alert alert-info" style="flex: 2; margin-bottom: 0;">
+                                    View Only - Already processed or awaiting others.
+                                </div>
+                            `}
+                            <button class="btn btn-full-details" onclick="openApprovalModal('${req.requestID}')">
+                                <span>👁</span> Full Details
+                            </button>
                         </div>
                     </div>
                 `;
             }).join('');
+
+            html += `</div>`;
+            container.innerHTML = html;
+        }
+
+        function quickApprove(requestID, action) {
+            if (action === 'Disapprove') {
+                // For disapproval, we still want to use the modal to get comments
+                openApprovalModal(requestID);
+                // Set a small delay to allow modal to render then focus comments
+                setTimeout(() => {
+                    const comments = document.getElementById('approvalComments');
+                    if (comments) comments.focus();
+                }, 500);
+                return;
+            }
+
+            // For approval, we can ask for confirmation or just proceed
+            if (confirm(`Are you sure you want to approve request ${requestID}?`)) {
+                showLoadingModal('Approving request...');
+                google.script.run
+                    .withSuccessHandler(onApprovalSubmitted)
+                    .withFailureHandler(onApprovalError)
+                    .approveRequest(requestID, 'Approve', 'Approved via quick action');
+            }
         }
 
         function getCachedRequest(list, requestID) {
