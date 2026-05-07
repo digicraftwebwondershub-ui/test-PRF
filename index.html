@@ -2190,8 +2190,32 @@
             return (list || []).find(req => req.requestID === requestID) || null;
         }
 
+        function getStepApprovalStatus(request, label) {
+            if (!request) return "";
+            const norm = (label || "").toLowerCase().trim();
+            if (norm.indexOf("plant") !== -1) return (request.plantHeadApproval || "").toLowerCase().trim();
+            if (norm.indexOf("bu") !== -1 || norm.indexOf("business") !== -1) return (request.buHeadApproval || "").toLowerCase().trim();
+            if (norm.indexOf("legal") !== -1) return (request.legalApproval || "").toLowerCase().trim();
+            if (norm.indexOf("corporate") !== -1 && (norm.indexOf("hrod") !== -1 || norm.indexOf("hr") !== -1)) return (request.corporateHrodApproval || "").toLowerCase().trim();
+            return "";
+        }
+
         function getCurrentApprovalStepIndex(request) {
-            return (request.approvalSteps || []).findIndex(step => step.approver === request.currentApprover || step.label === request.currentApprover);
+            const steps = request.approvalSteps || [];
+            const currentApprover = (request.currentApprover || "").toString().trim();
+            
+            for (let i = 0; i < steps.length; i++) {
+                const step = steps[i];
+                if (step.approver === currentApprover || step.label === currentApprover) {
+                    // Check if this specific stage is already approved
+                    const status = getStepApprovalStatus(request, step.label);
+                    if (status === "approved") {
+                        continue; // Skip and look for the next match
+                    }
+                    return i;
+                }
+            }
+            return -1;
         }
 
         function getApprovalRemark(request, step, index) {
@@ -2469,8 +2493,25 @@
                 let state = 'pending';
                 let stateLabel = 'Pending';
                 
-                // Determine state based on status and currentIndex
-                if (status === 'Disapproved') {
+                // Determine state based on status and explicit approval fields
+                const checkApprovalState = (val) => {
+                    const v = (val || '').toLowerCase().trim();
+                    if (v.indexOf('approved') === 0) return { state: 'completed', label: 'Approved' };
+                    if (v.indexOf('disapproved') === 0) return { state: 'disapproved', label: 'Disapproved' };
+                    if (v.indexOf('hold') !== -1) return { state: 'on_hold', label: 'On Hold' };
+                    return null;
+                };
+
+                let explicitState = null;
+                if (step.role === 'Plant Head') explicitState = checkApprovalState(plantHeadAppr);
+                else if (step.role === 'BU Head') explicitState = checkApprovalState(buHeadAppr);
+                else if (step.role === 'Legal Team') explicitState = checkApprovalState(legalAppr);
+                else if (step.role === 'Corporate HROD') explicitState = checkApprovalState(corpHrodAppr);
+
+                if (explicitState) {
+                    state = explicitState.state;
+                    stateLabel = explicitState.label;
+                } else if (status === 'Disapproved') {
                     state = 'disapproved';
                     stateLabel = 'Disapproved';
                 } else if (status === 'On Hold' && currentIndex === index) {
@@ -2482,12 +2523,6 @@
                 } else if (currentIndex === index) {
                     state = 'current';
                     stateLabel = 'In Progress';
-                } else if (currentIndex > index || currentIndex === -1) {
-                    // If currentIndex is -1 but status is not Pending, it's either approved or in Step 3/4
-                    if (status !== 'Pending' || plantHeadAppr || buHeadAppr) {
-                        state = 'completed';
-                        stateLabel = 'Approved';
-                    }
                 }
 
                 // Refine labels for specific roles
