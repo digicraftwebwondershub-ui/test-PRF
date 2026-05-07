@@ -725,52 +725,72 @@
         }
 
         .modal-content {
-            background: white;
+            background: #f8fafc;
             border-radius: var(--radius-lg);
-            width: 90%;
-            max-width: 600px;
-            max-height: 90vh;
-            overflow-y: auto;
-            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3);
-            animation: slideIn 0.3s ease;
+            width: 95%;
+            max-width: 900px;
+            max-height: 95vh;
+            overflow: hidden;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            animation: slideIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            display: flex;
+            flex-direction: column;
         }
 
         @keyframes slideIn {
-            from { transform: translateY(-50px); opacity: 0; }
+            from { transform: translateY(20px); opacity: 0; }
             to { transform: translateY(0); opacity: 1; }
         }
 
         .modal-header {
-            padding: 2rem;
-            border-bottom: 1px solid var(--gray-200);
+            padding: 1.25rem 1.5rem;
+            background: #2563eb;
+            color: white;
             display: flex;
             justify-content: space-between;
             align-items: center;
+            flex-shrink: 0;
         }
 
         .modal-title {
-            font-size: 1.5rem;
+            font-size: 1.25rem;
             font-weight: 700;
+            letter-spacing: -0.01em;
         }
 
         .modal-close {
-            background: none;
+            background: rgba(255, 255, 255, 0.1);
             border: none;
             font-size: 1.5rem;
             cursor: pointer;
-            color: var(--gray-500);
+            color: white;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 6px;
+            transition: all 0.2s;
+        }
+
+        .modal-close:hover {
+            background: rgba(255, 255, 255, 0.2);
         }
 
         .modal-body {
-            padding: 2rem;
+            padding: 1.5rem;
+            overflow-y: auto;
+            flex-grow: 1;
         }
 
         .modal-footer {
-            padding: 1.5rem 2rem;
+            padding: 1.25rem 1.5rem;
             border-top: 1px solid var(--gray-200);
             display: flex;
-            justify-content: flex-end;
-            gap: 1rem;
+            justify-content: space-between;
+            align-items: center;
+            background: white;
+            flex-shrink: 0;
         }
 
         .modal-footer-actions {
@@ -1342,31 +1362,29 @@
 
         /* New Approval Card Styles */
         .approval-section-container {
-            background: white;
-            border-radius: var(--radius-lg);
-            overflow: hidden;
-            box-shadow: var(--shadow-md);
+            background: transparent;
             margin-bottom: 2rem;
-            border: 1px solid var(--gray-200);
         }
 
         .approval-section-header {
-            background: #3b82f6; /* Modern Blue */
+            background: #2563eb;
             color: white;
-            padding: 1.25rem 1.5rem;
+            padding: 1rem 1.5rem;
             display: flex;
             align-items: center;
             gap: 0.75rem;
-            font-size: 1.15rem;
+            font-size: 1.1rem;
             font-weight: 600;
+            border-radius: 12px 12px 0 0;
         }
 
         .approval-card {
-            background: #fffcfc; /* Very light red/white */
-            border: 1px solid #fee2e2;
+            background: white;
+            border: 1px solid var(--gray-200);
             border-radius: var(--radius-lg);
-            padding: 1.75rem;
-            margin: 1.5rem;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: var(--shadow);
         }
 
         .approval-card-header {
@@ -1415,60 +1433,66 @@
         }
 
         .details-grid-card {
-            border: 1px solid var(--gray-200);
-            border-radius: var(--radius);
+            border: 1px solid #e2e8f0;
+            border-radius: 16px;
             padding: 1.5rem;
             margin-bottom: 1.5rem;
             background: white;
         }
 
         .details-grid-title {
-            font-size: 0.95rem;
+            font-size: 1.1rem;
             font-weight: 700;
-            color: var(--gray-800);
-            margin-bottom: 1.25rem;
+            color: #1e293b;
+            margin-bottom: 1.5rem;
         }
 
         .details-grid {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
-            gap: 1.25rem;
+            gap: 1.5rem;
         }
 
         .details-item {
-            font-size: 0.9rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
         }
 
         .details-label {
-            color: var(--gray-500);
-            margin-right: 0.5rem;
+            font-size: 0.75rem;
+            color: #64748b;
+            font-weight: 500;
         }
 
         .details-value {
+            font-size: 0.95rem;
             font-weight: 700;
-            color: var(--gray-900);
+            color: #1e293b;
         }
 
         .gap-analysis-grid {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
-            gap: 1.25rem;
+            gap: 1rem;
         }
 
         .gap-box {
-            padding: 1.25rem;
-            border-radius: 10px;
+            padding: 1rem;
+            border-radius: 12px;
             text-align: center;
             display: flex;
             flex-direction: column;
             gap: 0.5rem;
+            justify-content: center;
+            min-height: 100px;
         }
 
         .gap-box-label {
-            font-size: 0.72rem;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
+            font-size: 0.7rem;
+            font-weight: 600;
+            color: inherit;
+            opacity: 0.8;
         }
 
         .gap-box-value {
@@ -1476,10 +1500,10 @@
             font-weight: 800;
         }
 
-        .gap-box.optimum { background: #fff7ed; color: #ea580c; border: 1px solid #ffedd5; }
-        .gap-box.actual { background: #eff6ff; color: #2563eb; border: 1px solid #dbeafe; }
+        .gap-box.optimum { background: #fff7ed; color: #c2410c; border: 1px solid #ffedd5; }
+        .gap-box.actual { background: #eff6ff; color: #1d4ed8; border: 1px solid #dbeafe; }
         .gap-box.gap { background: #fef2f2; color: #dc2626; border: 1px solid #fee2e2; }
-        .gap-box.requested { background: #faf5ff; color: #9333ea; border: 1px solid #f3e8ff; }
+        .gap-box.requested { background: #faf5ff; color: #7e22ce; border: 1px solid #f3e8ff; }
 
         .justification-alert {
             background: #fffbeb;
@@ -1519,39 +1543,33 @@
         }
 
         .btn-approve-forward {
-            background: #059669;
+            background: #10b981;
             color: white;
-            flex: 2;
+            flex: 1;
             justify-content: center;
-            border-radius: 14px;
+            border-radius: 12px;
             font-weight: 700;
-            padding: 1rem;
+            padding: 0.875rem;
             font-size: 1rem;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
         }
 
         .btn-approve-forward:hover {
-            background: #047857;
-            transform: translateY(-1px);
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            background: #059669;
         }
 
         .btn-reject-request {
-            background: #dc2626;
+            background: #ef4444;
             color: white;
-            flex: 2;
+            flex: 1;
             justify-content: center;
-            border-radius: 14px;
+            border-radius: 12px;
             font-weight: 700;
-            padding: 1rem;
+            padding: 0.875rem;
             font-size: 1rem;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
         }
 
         .btn-reject-request:hover {
-            background: #b91c1c;
-            transform: translateY(-1px);
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            background: #dc2626;
         }
 
         .btn-full-details {
@@ -1713,8 +1731,7 @@
                 </div>
 
                 <div id="approvalFilters" class="filter-pills"></div>
-                <div id="approvalsListNew" class="approvals-list-new"></div>
-                <div id="pendingApprovalsContainer" class="hidden"></div>
+                <div id="pendingApprovalsContainer"></div>
             </div>
 
             <!-- CREATE REQUEST TAB -->
@@ -2227,62 +2244,99 @@
                     <div class="empty-state">
                         <div class="empty-icon">📋</div>
                         <div class="empty-title">No Requests Yet</div>
-                        <p>You haven\'t created any manpower requests yet.</p>
+                        <p>You haven't created any manpower requests yet.</p>
                     </div>
                 `;
                 return;
             }
 
             const requestsToRender = isRequestsTab ? requests : requests.slice(0, 5);
+
             let html = '';
+            if (isRequestsTab) {
+                html += `
+                    <div class="approval-section-container">
+                        <div class="approval-section-header">
+                            <span style="font-size: 1.25rem;">📝</span>
+                            <span>My Requests (${requests.length})</span>
+                        </div>
+                `;
+            }
 
             requestsToRender.forEach(req => {
                 const status = (req.status || 'Pending').toString();
-                // For "Approved" status, show a more descriptive label
-                let displayStatus = status;
-                if (status === 'Approved') {
-                    displayStatus = 'Pre-approved - Action Required';
-                } else if (status.indexOf('Step 3') !== -1) {
-                    displayStatus = 'Step 3: Select Type';
-                } else if (status.indexOf('Step 4') !== -1) {
-                    displayStatus = 'Step 4: Review';
-                } else if (status === 'Sourcing In Progress') {
-                    displayStatus = 'Sourcing In Progress';
-                }
-                let statusBadge = `<span class="badge badge-${status.toLowerCase().replace(' ', '-')}">${displayStatus}</span>`;
-                const createdDate = new Date(req.createdDate || Date.now());
-                const displayDate = isNaN(createdDate.getTime()) ? 'No date' : createdDate.toLocaleDateString();
                 const manpowerValues = getRequestManpowerValues(req);
+                const manpowerData = req.manpowerData || {};
+                const isExceptional = manpowerData.isExceptional;
+                const requestedHeadcount = (req.positions || []).reduce((sum, p) => sum + (parseInt(p.headcount) || 0), 0);
+
+                let displayStatus = status;
+                if (status === 'Approved') displayStatus = 'Pre-Approved - Continue Request';
+                else if (status.indexOf('Step 3') !== -1) displayStatus = 'Step 3: Select Type';
+                else if (status.indexOf('Step 4') !== -1) displayStatus = 'Step 4: Review';
+
+                const statusClass = status.toLowerCase().replace(/\s+/g, '-');
+                const createdDate = new Date(req.createdDate || Date.now());
+                const displayDate = isNaN(createdDate.getTime()) ? 'No date' : createdDate.toISOString().split('T')[0];
+
                 html += `
-                    <div class="request-item ${status.toLowerCase().replace(' ', '-')}" onclick="openRequestDetails('${req.requestID}')" style="cursor: pointer;">
-                        <div class="request-info">
-                            <div class="request-id">${req.requestID}</div>
-                            <div class="request-meta">
-                                <div class="request-meta-item">
-                                    <span>📅</span>
-                                    <span>${displayDate}</span>
-                                </div>
-                                <div class="request-meta-item">
-                                    <span>🏢</span>
-                                    <span>${req.department || '-'}</span>
-                                </div>
-                                <div class="request-meta-item">
-                                    <span>📊</span>
-                                    <span>Optimum HC: ${formatDisplayValue(manpowerValues.optimumHC, '-')}</span>
-                                </div>
-                                <div class="request-meta-item">
-                                    <span>👥</span>
-                                    <span>Actual HC: ${formatDisplayValue(manpowerValues.actualHC, '-')}</span>
-                                </div>
+                    <div class="approval-card">
+                        <div class="approval-card-header">
+                            <div class="approval-card-title">
+                                ${req.requestID}
+                                ${isExceptional ? `
+                                    <span class="exceptional-badge">
+                                        <span>⚠</span> Exceptional Request
+                                    </span>
+                                ` : ''}
+                                <span class="badge badge-${statusClass}" style="margin-left: auto;">${displayStatus}</span>
                             </div>
                         </div>
-                        <div class="request-actions">
-                            ${statusBadge}
+
+                        <div class="approval-card-meta">
+                            <div>Date: <strong>${displayDate}</strong></div>
+                            <div>Department: <strong>${escapeHtml(req.department || '-')}</strong></div>
+                        </div>
+
+                        <div class="details-grid-card">
+                            <div class="details-grid">
+                                <div class="details-item"><span class="details-label">Category:</span> <span class="details-value">${escapeHtml(req.category || '-')}</span></div>
+                                <div class="details-item"><span class="details-label">Division:</span> <span class="details-value">${escapeHtml(req.division || '-')}</span></div>
+                                <div class="details-item"><span class="details-label">Group:</span> <span class="details-value">${escapeHtml(req.group || '-')}</span></div>
+                            </div>
+                        </div>
+
+                        <div class="gap-analysis-grid" style="margin-bottom: 1.5rem;">
+                            <div class="gap-box optimum">
+                                <span class="gap-box-label">Optimum HC</span>
+                                <span class="gap-box-value">${formatDisplayValue(manpowerValues.optimumHC, '0')}</span>
+                            </div>
+                            <div class="gap-box actual">
+                                <span class="gap-box-label">Actual HC</span>
+                                <span class="gap-box-value">${formatDisplayValue(manpowerValues.actualHC, '0')}</span>
+                            </div>
+                            <div class="gap-box gap">
+                                <span class="gap-box-label">Gap</span>
+                                <span class="gap-box-value">${formatDisplayValue(manpowerValues.gap, '0')}</span>
+                            </div>
+                            <div class="gap-box requested">
+                                <span class="gap-box-label">Requested</span>
+                                <span class="gap-box-value">${requestedHeadcount > 0 ? '+' + requestedHeadcount : '-'}</span>
+                            </div>
+                        </div>
+
+                        <div class="approval-actions-footer">
+                            <button class="btn btn-primary" style="flex: 1; justify-content: center;" onclick="openRequestDetails('${req.requestID}')">
+                                <span>👁</span> View Full Details
+                            </button>
                         </div>
                     </div>
                 `;
             });
 
+            if (isRequestsTab) {
+                html += `</div>`;
+            }
             container.innerHTML = html;
             updateNavigationBadges();
         }
@@ -2370,7 +2424,7 @@
         }
 
         function renderApprovalList() {
-            const container = document.getElementById('approvalsListNew');
+            const container = document.getElementById('pendingApprovalsContainer');
             if (!container) return;
 
             if (!appState.pendingApprovals.length) {
@@ -3084,231 +3138,279 @@
 
             const manpowerData = request.manpowerData || {};
             const manpowerValues = getRequestManpowerValues(request);
-            const positionsHtml = renderPositionsTable(request);
             const status = normalizeStatus(request.status, 'Pending');
-            let exceptionalHtml = '';
-            if (manpowerData.isExceptional) {
-                exceptionalHtml = `
-                    <div style="background: rgba(239, 68, 68, 0.1); border-left: 4px solid #ef4444; padding: 1rem; border-radius: 8px; margin-bottom: 1.5rem;">
-                        <strong style="color: #b91c1c;">⚠ EXCEPTIONAL CASE - NO MANPOWER GAP</strong>
-                        <div style="margin-top: 0.5rem; font-size: 0.9rem; color: #7f1d1d;">
-                            <p><strong>Optimum HC:</strong> ${manpowerData.optimumHC} | <strong>Actual HC:</strong> ${manpowerData.actualHC}</p>
-                            <p>This request was submitted as an exceptional case due to ${manpowerData.gap < 0 ? 'surplus' : 'no'} manpower.</p>
-                        </div>
-                    </div>
-                `;
-            }
+            const requestedHeadcount = (request.positions || []).reduce((sum, p) => sum + (parseInt(p.headcount) || 0), 0);
+
+            // Update modal title
+            const modalTitleEl = document.querySelector('#requestDetailModal .modal-title');
+            if (modalTitleEl) modalTitleEl.textContent = `Request Details - ${request.requestID}`;
+
+            let displayStatus = status;
+            if (status === 'Approved') displayStatus = 'Pre-Approved - Continue Request';
+            const statusClass = status.toLowerCase().replace(/\s+/g, '-');
 
             const content = `
-                ${exceptionalHtml}
-                ${renderStatusOverview(request)}
-                ${renderApprovalTracker(request)}
-                ${renderApprovalRemarkCards(request)}
-                <div class="info-card">
-                    <div class="card-header">
-                        <h4>📋 Request Information</h4>
-                    </div>
-                    <div class="card-body">
-                        <div class="form-group">
-                            <label class="form-label"><strong>Request ID</strong></label>
-                            <p>${request.requestID}</p>
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label"><strong>Requested By</strong></label>
-                            <p>${request.requestedBy || request.email || '-'}</p>
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label"><strong>Department</strong></label>
-                            <p>${request.department || '-'}</p>
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label"><strong>Category</strong></label>
-                            <p>${request.category || '-'}</p>
+                <div style="display: flex; flex-direction: column; gap: 1.5rem;">
+                    <!-- Current Status Section -->
+                    <div class="details-grid-card" style="margin-bottom: 0;">
+                        <div class="details-grid-title" style="margin-bottom: 1rem; font-size: 1rem; color: #1e293b;">Current Status</div>
+                        <div style="background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 12px; padding: 1.25rem; color: #1d4ed8; display: flex; align-items: center; gap: 0.75rem;">
+                            <div style="width: 24px; height: 24px; border-radius: 50%; border: 2px solid #1d4ed8; display: flex; align-items: center; justify-content: center; font-size: 0.8rem; font-weight: 800;">i</div>
+                            <strong style="font-size: 1rem;">${displayStatus}</strong>
                         </div>
                     </div>
-                </div>
-                <div class="info-card">
-                    <div class="card-header">
-                        <h4>📊 Manpower Data</h4>
-                    </div>
-                    <div class="card-body">
-                        <div class="form-group">
-                            <label class="form-label"><strong>Optimum Manpower HC</strong></label>
-                            <p>${formatDisplayValue(manpowerValues.optimumHC)}</p>
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label"><strong>Actual Manpower HC</strong></label>
-                            <p>${formatDisplayValue(manpowerValues.actualHC)}</p>
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label"><strong>Gap</strong></label>
-                            <p style="${getGapDisplayStyle(manpowerValues.gap)}">${formatDisplayValue(manpowerValues.gap)}</p>
+
+                    <!-- Organizational Details Section -->
+                    <div class="details-grid-card" style="margin-bottom: 0;">
+                        <div class="details-grid-title" style="font-size: 1rem; color: #1e293b;">Organizational Details</div>
+                        <div class="details-grid" style="grid-template-columns: repeat(3, 1fr);">
+                            <div class="details-item"><span class="details-label">Category</span><span class="details-value">${escapeHtml(request.category || '-')}</span></div>
+                            <div class="details-item"><span class="details-label">Division</span><span class="details-value">${escapeHtml(request.division || '-')}</span></div>
+                            <div class="details-item"><span class="details-label">Group</span><span class="details-value">${escapeHtml(request.group || '-')}</span></div>
+                            <div class="details-item"><span class="details-label">Department</span><span class="details-value">${escapeHtml(request.department || '-')}</span></div>
+                            <div class="details-item"><span class="details-label">Section</span><span class="details-value">${escapeHtml(request.section || '-')}</span></div>
+                            <div class="details-item"><span class="details-label">Unit</span><span class="details-value">${escapeHtml(request.unit || '-')}</span></div>
+                            <div class="details-item"><span class="details-label">Line</span><span class="details-value">${escapeHtml(request.line || '-')}</span></div>
                         </div>
                     </div>
-                </div>
-                ${positionsHtml ? `
-                    <div class="info-card">
-                        <div class="card-header">
-                            <h4>👥 Requested Positions</h4>
-                        </div>
-                        <div class="card-body">
-                            ${positionsHtml}
-                        </div>
-                    </div>
-                ` : ''}
-                ${renderAttachedFiles(request)}
-                <div class="info-card">
-                    <div class="card-header">
-                        <h4>📝 Business Need</h4>
-                    </div>
-                    <div class="card-body">
-                        <div class="form-group">
-                            <label class="form-label"><strong>Justification</strong></label>
-                            <p>${request.justification || '-'}</p>
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label"><strong>Details</strong></label>
-                            <p>${request.details || '-'}</p>
+
+                    <!-- Manpower Gap Analysis Section -->
+                    <div class="details-grid-card" style="margin-bottom: 0;">
+                        <div class="details-grid-title" style="font-size: 1rem; color: #1e293b;">Manpower Gap Analysis</div>
+                        <div class="gap-analysis-grid">
+                            <div class="gap-box optimum">
+                                <span class="gap-box-label">Optimum HC</span>
+                                <span class="gap-box-value" style="color: #ea580c;">${manpowerValues.optimumHC || '0'}</span>
+                            </div>
+                            <div class="gap-box actual">
+                                <span class="gap-box-label">Actual HC</span>
+                                <span class="gap-box-value" style="color: #2563eb;">${manpowerValues.actualHC || '0'}</span>
+                            </div>
+                            <div class="gap-box gap">
+                                <span class="gap-box-label">Gap</span>
+                                <span class="gap-box-value" style="color: #dc2626;">${manpowerValues.gap > 0 ? '+' + manpowerValues.gap : manpowerValues.gap || '0'}</span>
+                            </div>
+                            <div class="gap-box requested">
+                                <span class="gap-box-label">Requested</span>
+                                <span class="gap-box-value" style="color: #9333ea;">${requestedHeadcount > 0 ? '+' + requestedHeadcount : '+'}</span>
+                            </div>
                         </div>
                     </div>
+
+                    <!-- Approval Workflow Section -->
+                    ${renderNewApprovalTracker(request)}
                 </div>
             `;
 
             // Update footer with status-specific buttons
-            const footerContent = status === 'Approved' 
-                ? `
-                    <div class="modal-footer-actions">
-                        <button class="btn btn-secondary" onclick="closeModal('requestDetailModal')">Close</button>
-                        <button class="btn btn-success" onclick="proceedToStep3Modal('${request.requestID}')">
-                            ➜ Proceed to Step 3: Select Request Type
-                        </button>
-                    </div>
-                `
-                : `
-                    <div class="modal-footer-actions">
-                        <button class="btn btn-secondary" onclick="closeModal('requestDetailModal')">Close</button>
-                    </div>
+            let footerContent = `<button class="btn btn-secondary" style="border-radius: 8px; padding: 0.75rem 1.5rem; font-weight: 600;" onclick="closeModal('requestDetailModal')">Close</button>`;
+
+            if (status === 'Approved') {
+                footerContent += `
+                    <button class="btn btn-success" style="flex-grow: 1; justify-content: center; border-radius: 12px; padding: 1rem; font-weight: 700; background: #10b981; color: white;" onclick="proceedToStep3Modal('${request.requestID}')">
+                        <span>✓</span> Continue to Request Type (Step 3) ➜
+                    </button>
                 `;
+            }
 
             document.getElementById('requestDetailModalContent').innerHTML = content;
             document.getElementById('requestDetailModalFooter').innerHTML = footerContent;
             openModal('requestDetailModal');
         }
 
+        function renderNewApprovalTracker(request) {
+            const tracker = request.approvalTracker || { steps: [] };
+            const steps = tracker.steps || [];
+
+            // Map steps into phases for visual grouping
+            const phase1Steps = steps.filter(s => s.label === 'Plant Head' || s.label === 'BU Head');
+            const phase2Steps = steps.filter(s => s.label === 'Legal Team');
+            const phase3Steps = steps.filter(s => s.label === 'Corporate HROD');
+
+            const phases = [];
+            if (phase1Steps.length) {
+                phases.push({ title: 'Phase 3: Initial Management Approval', steps: phase1Steps });
+            }
+            if (phase2Steps.length) {
+                phases.push({ title: 'Phase 4: Legal Review', steps: phase2Steps });
+            }
+            if (phase3Steps.length) {
+                phases.push({ title: 'Phase 5: Corporate Approval', steps: phase3Steps });
+            }
+
+            let html = `
+                <div class="details-grid-card" style="margin-bottom: 0;">
+                    <div class="details-grid-title">Approval Workflow - Multi-Phase Process</div>
+                    <div style="display: flex; flex-direction: column; gap: 1.5rem;">
+            `;
+
+            phases.forEach(phase => {
+                const phaseHasActivity = phase.steps.some(s => s.state !== 'pending');
+                const phaseColor = phaseHasActivity ? '#f0fdf4' : '#f8fafc';
+                const phaseBorder = phaseHasActivity ? '#dcfce7' : '#e2e8f0';
+                const phaseTitleColor = phaseHasActivity ? '#166534' : '#64748b';
+
+                html += `
+                    <div style="border: 1px solid ${phaseBorder}; border-radius: 16px; padding: 1.25rem; background: ${phaseColor};">
+                        <div style="font-weight: 700; color: ${phaseTitleColor}; margin-bottom: 1rem; font-size: 0.95rem;">${phase.title}</div>
+                        <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+                `;
+
+                phase.steps.forEach(step => {
+                    const state = step.state; // 'pending', 'current', 'completed', 'on_hold', 'disapproved'
+                    let stateLabel = 'Pending';
+                    let badgeClass = 'secondary';
+                    let icon = '';
+                    let accentColor = '#e2e8f0';
+                    let iconBg = '#f1f5f9';
+
+                    if (state === 'completed') {
+                        stateLabel = 'Approved';
+                        badgeClass = 'success';
+                        icon = '✓';
+                        accentColor = '#10b981';
+                        iconBg = '#10b981';
+                    } else if (state === 'disapproved') {
+                        stateLabel = 'Disapproved';
+                        badgeClass = 'danger';
+                        icon = '✕';
+                        accentColor = '#ef4444';
+                        iconBg = '#ef4444';
+                    } else if (state === 'on_hold') {
+                        stateLabel = 'On Hold';
+                        badgeClass = 'warning';
+                        icon = '⏸';
+                        accentColor = '#f59e0b';
+                        iconBg = '#f59e0b';
+                    } else if (state === 'current') {
+                        stateLabel = 'In Progress';
+                        badgeClass = 'primary';
+                        icon = '●';
+                        accentColor = '#2563eb';
+                        iconBg = '#dbeafe';
+                    }
+
+                    const dateStr = step.timestamp ? new Date(step.timestamp).toISOString().split('T')[0] : '';
+                    const actorName = step.actorName || (state === 'completed' || state === 'disapproved' ? 'Approver' : 'TBD');
+
+                    html += `
+                        <div style="background: white; border: 2px solid ${accentColor}; border-radius: 12px; padding: 1.25rem;">
+                            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.75rem;">
+                                <div style="display: flex; align-items: center; gap: 0.75rem;">
+                                    <div style="width: 24px; height: 24px; background: ${iconBg}; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: ${state === 'current' ? '#2563eb' : 'white'}; font-size: 0.9rem;">
+                                        ${icon}
+                                    </div>
+                                    <strong style="color: #1e293b; font-size: 1rem;">${step.label}</strong>
+                                </div>
+                                <span class="badge badge-${badgeClass}" style="font-size: 0.75rem; font-weight: 600; padding: 0.25rem 0.75rem; border-radius: 999px;">${stateLabel}</span>
+                            </div>
+                            <div style="font-size: 0.85rem; color: #64748b; margin-left: 2rem; margin-bottom: ${step.comment ? '1rem' : '0'}; line-height: 1.4;">
+                                <div>By: ${actorName}</div>
+                                ${dateStr ? `<div>Date: ${dateStr}</div>` : ''}
+                            </div>
+                            ${step.comment ? `
+                                <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 1rem; font-size: 0.9rem; color: #475569; margin-left: 2rem;">
+                                    <div style="font-weight: 600; font-size: 0.75rem; color: #64748b; margin-bottom: 0.5rem; text-transform: uppercase;">Remarks:</div>
+                                    ${escapeHtml(step.comment)}
+                                </div>
+                            ` : ''}
+                        </div>
+                    `;
+                });
+
+                html += `
+                        </div>
+                    </div>
+                `;
+            });
+
+            html += `
+                    </div>
+                </div>
+            `;
+            return html;
+        }
+
         function onLoadRequestForApproval(request) {
             appState.currentApproval = request;
             markItemAsSeen('approvals', request);
 
-            // Check if this is an exceptional case (no gap)
-            let exceptionalHtml = '';
             const manpowerData = request.manpowerData || {};
             const manpowerValues = getRequestManpowerValues(request);
-            const positionsHtml = renderPositionsTable(request);
-            if (manpowerData.isExceptional) {
-                exceptionalHtml = `
-                    <div class="info-card warning">
-                        <div class="card-header">
-                            <h4>⚠ Exceptional Case Notice</h4>
-                        </div>
-                        <div class="card-body">
-                            <p><strong>Optimum HC:</strong> ${manpowerData.optimumHC} | <strong>Actual HC:</strong> ${manpowerData.actualHC}</p>
-                            <p>This request requires your approval despite having ${manpowerData.gap < 0 ? 'surplus' : 'no'} manpower.</p>
-                        </div>
-                    </div>
-                `;
-            }
-
-            const attachedFilesHtml = renderAttachedFiles(request);
+            const status = normalizeStatus(request.status, 'Pending');
+            const requestedHeadcount = (request.positions || []).reduce((sum, p) => sum + (parseInt(p.headcount) || 0), 0);
             const historyOnly = request.canAct === false;
             updateApprovalActionButtons(!historyOnly);
 
+            // Update modal title
+            const modalTitleEl = document.querySelector('#approvalModal .modal-title');
+            if (modalTitleEl) modalTitleEl.textContent = `Review Request - ${request.requestID}`;
+
+            let displayStatus = status;
+            if (status === 'Approved') displayStatus = 'Pre-Approved - Continue Request';
+            const statusClass = status.toLowerCase().replace(/\s+/g, '-');
+
             let content = `
-                ${exceptionalHtml}
-                <div class="info-card">
-                    <div class="card-header">
-                        <h4>📋 Request Information</h4>
-                    </div>
-                    <div class="card-body">
-                        <div class="form-group">
-                            <label class="form-label"><strong>Request ID</strong></label>
-                            <p>${request.requestID}</p>
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label"><strong>Requested By</strong></label>
-                            <p>${request.requestedBy}</p>
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label"><strong>Department</strong></label>
-                            <p>${request.department}</p>
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label"><strong>Category</strong></label>
-                            <p>${request.category}</p>
+                <div style="display: flex; flex-direction: column; gap: 1.5rem;">
+                    <!-- Current Status Section -->
+                    <div class="details-grid-card" style="margin-bottom: 0;">
+                        <div class="details-grid-title" style="margin-bottom: 1rem; font-size: 1rem; color: #1e293b;">Current Status</div>
+                        <div style="background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 12px; padding: 1.25rem; color: #1d4ed8; display: flex; align-items: center; gap: 0.75rem;">
+                            <div style="width: 24px; height: 24px; border-radius: 50%; border: 2px solid #1d4ed8; display: flex; align-items: center; justify-content: center; font-size: 0.8rem; font-weight: 800;">i</div>
+                            <strong style="font-size: 1rem;">${displayStatus}</strong>
                         </div>
                     </div>
-                </div>
-                <div class="info-card">
-                    <div class="card-header">
-                        <h4>📊 Manpower Data</h4>
-                    </div>
-                    <div class="card-body">
-                        <div class="form-group">
-                            <label class="form-label"><strong>Optimum Manpower HC</strong></label>
-                            <p>${formatDisplayValue(manpowerValues.optimumHC)}</p>
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label"><strong>Actual Manpower HC</strong></label>
-                            <p>${formatDisplayValue(manpowerValues.actualHC)}</p>
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label"><strong>Gap</strong></label>
-                            <p style="${getGapDisplayStyle(manpowerValues.gap)}">${formatDisplayValue(manpowerValues.gap)}</p>
+
+                    <!-- Organizational Details Section -->
+                    <div class="details-grid-card" style="margin-bottom: 0;">
+                        <div class="details-grid-title" style="font-size: 1rem; color: #1e293b;">Organizational Details</div>
+                        <div class="details-grid" style="grid-template-columns: repeat(3, 1fr);">
+                            <div class="details-item"><span class="details-label">Category</span><span class="details-value">${escapeHtml(request.category || '-')}</span></div>
+                            <div class="details-item"><span class="details-label">Division</span><span class="details-value">${escapeHtml(request.division || '-')}</span></div>
+                            <div class="details-item"><span class="details-label">Group</span><span class="details-value">${escapeHtml(request.group || '-')}</span></div>
+                            <div class="details-item"><span class="details-label">Department</span><span class="details-value">${escapeHtml(request.department || '-')}</span></div>
+                            <div class="details-item"><span class="details-label">Section</span><span class="details-value">${escapeHtml(request.section || '-')}</span></div>
+                            <div class="details-item"><span class="details-label">Unit</span><span class="details-value">${escapeHtml(request.unit || '-')}</span></div>
+                            <div class="details-item"><span class="details-label">Line</span><span class="details-value">${escapeHtml(request.line || '-')}</span></div>
                         </div>
                     </div>
-                </div>
-                <div class="info-card">
-                    <div class="card-header">
-                        <h4>📝 Justification</h4>
-                    </div>
-                    <div class="card-body">
-                        <p>${request.justification || 'No justification provided.'}</p>
-                    </div>
-                </div>
-                ${positionsHtml ? `
-                <div class="info-card">
-                    <div class="card-header">
-                        <h4>👥 Requested Positions</h4>
-                    </div>
-                    <div class="card-body">
-                        ${positionsHtml}
-                    </div>
-                </div>
-                ` : ''}
-                ${attachedFilesHtml}
-                ${renderStatusOverview(request)}
-                ${renderApprovalTracker(request)}
-                ${renderApprovalRemarkCards(request)}
-                ${historyOnly ? `
-                    <div class="alert alert-info">
-                        <div>
-                            <strong>History view only.</strong>
-                            <div>This request remains in your Approval tab for tracking, but no further action is required from you.</div>
-                        </div>
-                    </div>
-                ` : ''}
-                ${historyOnly ? '' : `
-                    <div class="info-card">
-                        <div class="card-header">
-                            <h4>💬 Approval Comments</h4>
-                        </div>
-                        <div class="card-body">
-                            <div class="form-group">
-                                <label class="form-label">Comments (Required for Disapproval)</label>
-                                <textarea class="form-textarea" id="approvalComments" placeholder="Enter your comments..."></textarea>
+
+                    <!-- Manpower Gap Analysis Section -->
+                    <div class="details-grid-card" style="margin-bottom: 0;">
+                        <div class="details-grid-title" style="font-size: 1rem; color: #1e293b;">Manpower Gap Analysis</div>
+                        <div class="gap-analysis-grid">
+                            <div class="gap-box optimum">
+                                <span class="gap-box-label">Optimum HC</span>
+                                <span class="gap-box-value" style="color: #ea580c;">${manpowerValues.optimumHC || '0'}</span>
+                            </div>
+                            <div class="gap-box actual">
+                                <span class="gap-box-label">Actual HC</span>
+                                <span class="gap-box-value" style="color: #2563eb;">${manpowerValues.actualHC || '0'}</span>
+                            </div>
+                            <div class="gap-box gap">
+                                <span class="gap-box-label">Gap</span>
+                                <span class="gap-box-value" style="color: #dc2626;">${manpowerValues.gap > 0 ? '+' + manpowerValues.gap : manpowerValues.gap || '0'}</span>
+                            </div>
+                            <div class="gap-box requested">
+                                <span class="gap-box-label">Requested</span>
+                                <span class="gap-box-value" style="color: #9333ea;">${requestedHeadcount > 0 ? '+' + requestedHeadcount : '+'}</span>
                             </div>
                         </div>
                     </div>
-                `}
+
+                    <!-- Approval Workflow Section -->
+                    ${renderNewApprovalTracker(request)}
+
+                    ${historyOnly ? '' : `
+                        <div class="details-grid-card" style="margin-bottom: 0;">
+                            <div class="details-grid-title" style="font-size: 1rem; color: #1e293b;">Approval Action</div>
+                            <div class="form-group">
+                                <label class="form-label" style="font-size: 0.85rem; color: #64748b;">Comments (Required for Disapproval)</label>
+                                <textarea class="form-textarea" id="approvalComments" placeholder="Enter your comments..." style="border-radius: 12px; border-color: #e2e8f0;"></textarea>
+                            </div>
+                        </div>
+                    `}
+                </div>
             `;
 
             document.getElementById('approvalModalContent').innerHTML = content;
@@ -3748,7 +3850,8 @@
         }
 
         function formatDisplayValue(value, fallback = 'N/A') {
-            return value === '' || value === null || value === undefined ? fallback : value;
+            if (value === '' || value === null || value === undefined) return fallback;
+            return value;
         }
 
         function getGapDisplayStyle(value) {
