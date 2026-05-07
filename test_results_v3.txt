@@ -1,0 +1,26 @@
+
+Running 3 tests using 1 worker
+
+  ✘  1 verification/verify_step3_modal.spec.js:49:3 › Step 3 Modal Logic › Replacement type fetches employees and updates dropdown (618ms)
+  ✓  2 verification/verify_step3_modal.spec.js:65:3 › Step 3 Modal Logic › Additional type shows form and toggles seasonal fields (958ms)
+  ✓  3 verification/verify_step3_modal.spec.js:90:3 › Step 3 Modal Logic › addPositionField maintains correct visibility for seasonal fields (518ms)
+
+
+  1) verification/verify_step3_modal.spec.js:49:3 › Step 3 Modal Logic › Replacement type fetches employees and updates dropdown
+
+    Error: page.evaluate: TypeError: Cannot read properties of undefined (reading 'section')
+        at onStep3TypeChange (about:blank:1534:52)
+        at eval (eval at evaluate (:302:30), <anonymous>:1:7)
+        at UtilityScript.evaluate (<anonymous>:304:16)
+        at UtilityScript.<anonymous> (<anonymous>:1:44)
+        at onStep3TypeChange (about:blank:1534:52)
+        at eval (eval at evaluate (:302:30), <anonymous>:1:7)
+        at UtilityScript.evaluate (<anonymous>:304:16)
+        at UtilityScript.<anonymous> (<anonymous>:1:44)
+        at /app/verification/verify_step3_modal.spec.js:50:16
+
+    Error Context: test-results/verification-verify_step3_-204c5-loyees-and-updates-dropdown/error-context.md
+
+  1 failed
+    verification/verify_step3_modal.spec.js:49:3 › Step 3 Modal Logic › Replacement type fetches employees and updates dropdown
+  2 passed (4.3s)

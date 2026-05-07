@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Manpower Request Management System</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         :root {
             --primary: #2563eb;
@@ -1698,14 +1699,27 @@
                     </div>
                 </div>
 
-                <div class="card">
-                    <div class="card-header">
-                        <div>
-                            <div class="card-title">Recent Requests</div>
-                            <div class="card-subtitle">Your last 5 requests</div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 2rem;">
+                    <div class="card">
+                        <div class="card-header">
+                            <div>
+                                <div class="card-title">Manpower Gap by Department</div>
+                                <div class="card-subtitle">Overview of current staffing needs</div>
+                            </div>
+                        </div>
+                        <div style="height: 300px; position: relative;">
+                            <canvas id="gapChart"></canvas>
                         </div>
                     </div>
-                    <div id="recentRequestsContainer"></div>
+                    <div class="card">
+                        <div class="card-header">
+                            <div>
+                                <div class="card-title">Recent Requests</div>
+                                <div class="card-subtitle">Your last 5 requests</div>
+                            </div>
+                        </div>
+                        <div id="recentRequestsContainer"></div>
+                    </div>
                 </div>
             </div>
 
@@ -1715,6 +1729,9 @@
                     <div>
                         <h1 class="page-title">My Requests</h1>
                         <p class="page-subtitle">Track all your manpower requests</p>
+                    </div>
+                    <div style="width: 300px;">
+                        <input type="text" class="form-input" id="myRequestsSearch" placeholder="🔍 Search requests..." onkeyup="filterMyRequests()">
                     </div>
                 </div>
 
@@ -1727,6 +1744,9 @@
                     <div>
                         <h1 class="page-title">Approvals</h1>
                         <p class="page-subtitle">Review and approve exceptional manpower requests</p>
+                    </div>
+                    <div style="width: 300px;">
+                        <input type="text" class="form-input" id="approvalsSearch" placeholder="🔍 Search approvals..." onkeyup="filterApprovals()">
                     </div>
                 </div>
 
@@ -2131,6 +2151,7 @@
 
         function onInitializeSuccess(data) {
             appState.user = data.user;
+            appState.userRole = data.user.role;
             appState.divisions = data.divisions;
             appState.structure = data.divisions;
 
@@ -2139,9 +2160,8 @@
             document.getElementById('userEmail').textContent = data.user.email;
             document.getElementById('currentRole').textContent = 'Role: ' + data.user.role;
 
-            if (data.user.role === 'Approver' || data.user.role === 'Admin') {
-                document.getElementById('approvalNav').style.display = 'block';
-            }
+            const isAdminOrApprover = data.user.role === 'Approver' || data.user.role === 'Admin';
+            document.getElementById('approvalNav').style.display = isAdminOrApprover ? 'block' : 'none';
 
             // Populate divisions
             populateDivisions();
@@ -2204,6 +2224,7 @@
             google.script.run.withSuccessHandler(onDashboardLoaded).getDashboardStats();
         }
 
+        let gapChart = null;
         function onDashboardLoaded(stats) {
             document.getElementById('statTotal').textContent = stats.total;
             document.getElementById('statPending').textContent = stats.pending;
@@ -2211,11 +2232,54 @@
             document.getElementById('statDisapproved').textContent = stats.disapproved;
             document.getElementById('statOnHold').textContent = stats.onHold;
 
+            if (stats.gapData) {
+                renderGapChart(stats.gapData);
+            }
+
             if (appState.myRequests.length > 0) {
                 onMyRequestsLoaded(appState.myRequests);
             } else {
                 google.script.run.withSuccessHandler(onMyRequestsLoaded).getMyRequests();
             }
+        }
+
+        function renderGapChart(gapData) {
+            const ctx = document.getElementById('gapChart').getContext('2d');
+
+            if (gapChart) {
+                gapChart.destroy();
+            }
+
+            gapChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: gapData.labels,
+                    datasets: [{
+                        label: 'Manpower Gap',
+                        data: gapData.values,
+                        backgroundColor: gapData.values.map(v => v > 0 ? 'rgba(37, 99, 235, 0.6)' : 'rgba(239, 68, 68, 0.6)'),
+                        borderColor: gapData.values.map(v => v > 0 ? 'rgb(37, 99, 235)' : 'rgb(239, 68, 68)'),
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                stepSize: 1
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    }
+                }
+            });
         }
 
         // ============================================================
@@ -2231,20 +2295,43 @@
             google.script.run.withSuccessHandler(onMyRequestsLoaded).getMyRequests();
         }
 
+        function filterMyRequests() {
+            const query = document.getElementById('myRequestsSearch').value.toLowerCase();
+            const filtered = appState.myRequests.filter(req =>
+                req.requestID.toLowerCase().includes(query) ||
+                (req.department || '').toLowerCase().includes(query) ||
+                (req.status || '').toLowerCase().includes(query)
+            );
+            renderRequestList(filtered, 'myRequestsContainer', true);
+        }
+
         function onMyRequestsLoaded(requests) {
             appState.myRequests = requests || [];
             const isRequestsTab = appState.currentTab === 'requests';
-            const container = isRequestsTab
-                ? document.getElementById('myRequestsContainer')
-                : document.getElementById('recentRequestsContainer');
+
+            const query = isRequestsTab ? document.getElementById('myRequestsSearch').value.toLowerCase() : '';
+            const filtered = isRequestsTab && query
+                ? appState.myRequests.filter(req =>
+                    req.requestID.toLowerCase().includes(query) ||
+                    (req.department || '').toLowerCase().includes(query) ||
+                    (req.status || '').toLowerCase().includes(query)
+                )
+                : appState.myRequests;
+
+            renderRequestList(filtered, isRequestsTab ? 'myRequestsContainer' : 'recentRequestsContainer', isRequestsTab);
+            updateNavigationBadges();
+        }
+
+        function renderRequestList(requests, containerId, isRequestsTab) {
+            const container = document.getElementById(containerId);
             if (!container) return;
 
             if (requests.length === 0) {
                 container.innerHTML = `
                     <div class="empty-state">
                         <div class="empty-icon">📋</div>
-                        <div class="empty-title">No Requests Yet</div>
-                        <p>You haven't created any manpower requests yet.</p>
+                        <div class="empty-title">No Requests Found</div>
+                        <p>No manpower requests match your current view or search.</p>
                     </div>
                 `;
                 return;
@@ -2338,7 +2425,6 @@
                 html += `</div>`;
             }
             container.innerHTML = html;
-            updateNavigationBadges();
         }
 
         // ============================================================
@@ -2409,6 +2495,10 @@
             `).join('');
         }
 
+        function filterApprovals() {
+            renderApprovalList();
+        }
+
         function setApprovalFilter(filter) {
             appState.approvalFilter = filter;
             renderApprovalFilters(appState.pendingApprovals);
@@ -2438,7 +2528,17 @@
                 return;
             }
 
-            const approvals = getFilteredApprovals();
+            let approvals = getFilteredApprovals();
+
+            const query = document.getElementById('approvalsSearch').value.toLowerCase();
+            if (query) {
+                approvals = approvals.filter(req =>
+                    req.requestID.toLowerCase().includes(query) ||
+                    (req.department || '').toLowerCase().includes(query) ||
+                    (req.requestedBy || req.email || '').toLowerCase().includes(query)
+                );
+            }
+
             if (!approvals.length) {
                 container.innerHTML = `
                     <div class="empty-state">
@@ -3489,22 +3589,43 @@
 
         function onStep3TypeChange(type) {
             const container = document.getElementById('step3DetailsContainer');
+            const request = appState.currentStep3Request;
             
             if (type === 'Replacement') {
                 container.innerHTML = `
-                    <div>
-                        <div class="form-group">
-                            <label class="form-label"><strong>Select Employee to Replace</strong></label>
-                            <p style="font-size: 0.9em; color: #6b7280; margin-bottom: 10px;">Select from separated, resigned, or AWOL employees:</p>
-                            <select id="replacementEmployeeSelect" style="width: 100%; padding: 8px 12px; border: 1px solid #d1d5db; border-radius: 8px; font-size: 1em;">
-                                <option value="">-- Choose an employee --</option>
-                                <option value="emp1">John Doe - Production Operator (Resigned)</option>
-                                <option value="emp2">Jane Smith - Technician (Separated)</option>
-                                <option value="emp3">Bob Wilson - Supervisor (AWOL)</option>
-                            </select>
-                        </div>
+                    <div style="text-align: center; padding: 20px;">
+                        <div class="loader" style="width: 30px; height: 30px;"></div>
+                        <p style="margin-top: 10px; color: #64748b;">Fetching separated employees...</p>
                     </div>
                 `;
+
+                google.script.run
+                    .withSuccessHandler((employees) => {
+                        let options = '<option value="">-- Choose an employee --</option>';
+                        if (employees && employees.length > 0) {
+                            employees.forEach(emp => {
+                                options += `<option value="${emp.name}">${emp.name} - ${emp.position} (${emp.status})</option>`;
+                            });
+                        } else {
+                            options = '<option value="">No separated employees found for this section</option>';
+                        }
+
+                        container.innerHTML = `
+                            <div>
+                                <div class="form-group">
+                                    <label class="form-label"><strong>Select Employee to Replace</strong></label>
+                                    <p style="font-size: 0.9em; color: #6b7280; margin-bottom: 10px;">Select from separated, resigned, or AWOL employees:</p>
+                                    <select id="replacementEmployeeSelect" style="width: 100%; padding: 8px 12px; border: 1px solid #d1d5db; border-radius: 8px; font-size: 1em;">
+                                        ${options}
+                                    </select>
+                                </div>
+                            </div>
+                        `;
+                    })
+                    .withFailureHandler((error) => {
+                        container.innerHTML = `<div class="alert alert-danger">Error loading employees: ${error}</div>`;
+                    })
+                    .getSeparatedEmployees(request.section, request.line);
             } else if (type === 'Additional') {
                 container.innerHTML = `
                     <div>
@@ -3532,7 +3653,7 @@
                                     <label class="form-label"><strong>Headcount</strong></label>
                                     <input type="number" class="position-headcount" value="1" min="1" style="width: 100%; padding: 8px 12px; border: 1px solid #d1d5db; border-radius: 8px;">
                                 </div>
-                                <div id="seasonalDateFields" style="display: none;">
+                                <div class="seasonal-date-fields" style="display: none;">
                                     <div class="form-group">
                                         <label class="form-label"><strong>Start Date</strong></label>
                                         <input type="date" class="position-startDate" style="width: 100%; padding: 8px 12px; border: 1px solid #d1d5db; border-radius: 8px;">
@@ -3554,7 +3675,7 @@
         }
 
         function onEmploymentTypeChange(type) {
-            const dateFields = document.querySelectorAll('#seasonalDateFields');
+            const dateFields = document.querySelectorAll('.seasonal-date-fields');
             dateFields.forEach(field => {
                 field.style.display = type === 'Seasonal' ? 'block' : 'none';
             });
@@ -3581,18 +3702,16 @@
                     <label class="form-label"><strong>Headcount</strong></label>
                     <input type="number" class="position-headcount" value="1" min="1" style="width: 100%; padding: 8px 12px; border: 1px solid #d1d5db; border-radius: 8px;">
                 </div>
-                ${employmentType === 'Seasonal' ? `
-                    <div id="seasonalDateFields" style="display: block;">
-                        <div class="form-group">
-                            <label class="form-label"><strong>Start Date</strong></label>
-                            <input type="date" class="position-startDate" style="width: 100%; padding: 8px 12px; border: 1px solid #d1d5db; border-radius: 8px;">
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label"><strong>End Date</strong></label>
-                            <input type="date" class="position-endDate" style="width: 100%; padding: 8px 12px; border: 1px solid #d1d5db; border-radius: 8px;">
-                        </div>
+                <div class="seasonal-date-fields" style="display: ${employmentType === 'Seasonal' ? 'block' : 'none'};">
+                    <div class="form-group">
+                        <label class="form-label"><strong>Start Date</strong></label>
+                        <input type="date" class="position-startDate" style="width: 100%; padding: 8px 12px; border: 1px solid #d1d5db; border-radius: 8px;">
                     </div>
-                ` : ''}
+                    <div class="form-group">
+                        <label class="form-label"><strong>End Date</strong></label>
+                        <input type="date" class="position-endDate" style="width: 100%; padding: 8px 12px; border: 1px solid #d1d5db; border-radius: 8px;">
+                    </div>
+                </div>
             `;
             
             container.appendChild(newEntry);
@@ -4855,7 +4974,16 @@
         }
 
         function switchRole() {
-            const newRole = appState.userRole === 'Requestor' ? 'Approver' : 'Requestor';
+            // In a real system, this would be verified against permissions
+            // For this demo/internal tool, we toggle between roles if the user has permission
+            const actualUserRole = appState.user.role;
+
+            if (actualUserRole === 'Requestor') {
+                alert('You do not have permission to switch to Approver role.');
+                return;
+            }
+
+            const newRole = appState.userRole === 'Requestor' ? actualUserRole : 'Requestor';
             appState.userRole = newRole;
             document.getElementById('currentRole').textContent = 'Role: ' + newRole;
 
@@ -4867,10 +4995,11 @@
             if (newRole === 'Approver' || newRole === 'Admin') {
                 loadPendingApprovals(true);
             } else {
+                if (appState.currentTab === 'approvals') {
+                    switchTab('dashboard');
+                }
                 updateNavigationBadges();
             }
-
-            // Note: In production, this would call backend to verify permission
         }
 
         function closeModal(modalId) {

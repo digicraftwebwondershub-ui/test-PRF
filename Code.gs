@@ -2333,14 +2333,74 @@ function getDashboardStats() {
     }
   }
   
+  const gapData = getManpowerGapData();
+
   return {
     total: total,
     pending: pending,
     approved: approved,
     disapproved: disapproved,
     onHold: onHold,
-    approvalRate: total > 0 ? ((approved / total) * 100).toFixed(1) : 0
+    approvalRate: total > 0 ? ((approved / total) * 100).toFixed(1) : 0,
+    gapData: gapData
   };
+}
+
+/**
+ * Get manpower gap data aggregated by department
+ */
+function getManpowerGapData() {
+  const structure = getCompanyStructure();
+  const actualSheet = SpreadsheetApp.openById(SHEET_ID).getSheetByName(SHEET_NAMES.ORG_CHART);
+  const actualData = actualSheet.getDataRange().getValues();
+
+  const departmentStats = {};
+
+  // Initialize departments from structure
+  for (const div in structure) {
+    const groups = structure[div].groups || {};
+    for (const grp in groups) {
+      const depts = groups[grp].departments || {};
+      for (const dept in depts) {
+        if (!departmentStats[dept]) {
+          departmentStats[dept] = { optimum: 0, actual: 0 };
+        }
+
+        const sections = depts[dept].sections || {};
+        for (const sect in sections) {
+          const units = sections[sect].units || {};
+          for (const unit in units) {
+            const lines = units[unit].lines || {};
+            for (const line in lines) {
+              const hc = lines[line].optimumHC;
+              if (typeof hc === 'number' && !isNaN(hc)) {
+                departmentStats[dept].optimum += hc;
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+
+  // Count actual from Org Chart
+  for (let i = 1; i < actualData.length; i++) {
+    const dept = (actualData[i][9] || "").toString().trim();
+    const status = (actualData[i][20] || "").toString().trim();
+    if (status === "ACTIVE" && departmentStats[dept]) {
+      departmentStats[dept].actual += 1;
+    }
+  }
+
+  const labels = [];
+  const gaps = [];
+
+  for (const dept in departmentStats) {
+    labels.push(dept);
+    gaps.push(departmentStats[dept].optimum - departmentStats[dept].actual);
+  }
+
+  return { labels: labels, values: gaps };
 }
 
 // ============================================================
@@ -2351,15 +2411,45 @@ function getDashboardStats() {
  * Get separated/resigned employees
  */
 function getSeparatedEmployees(section, line) {
-  // This would normally query your HR system
-  // For now, returning mock data structure
-  const employees = [
-    { name: "John Doe", position: "Production Operator", status: "Resigned", dateLeft: "2024-01-15" },
-    { name: "Jane Smith", position: "Technician", status: "Separated", dateLeft: "2024-02-20" },
-    { name: "Bob Wilson", position: "Supervisor", status: "AWOL", dateLeft: "2024-03-10" }
-  ];
-  
-  return employees;
+  try {
+    const ss = SpreadsheetApp.openById(SHEET_ID);
+    const sheet = ss.getSheetByName(SHEET_NAMES.ORG_CHART);
+    if (!sheet) return [];
+
+    const data = sheet.getDataRange().getValues();
+    const separated = [];
+
+    // Column indices (matching calculateManpowerGap)
+    const NAME_COL = 2;
+    const POSITION_COL = 3;
+    const SECTION_COL = 10;
+    const LINE_COL = 12;
+    const STATUS_COL = 20;
+
+    for (let i = 1; i < data.length; i++) {
+      const row = data[i];
+      const status = (row[STATUS_COL] || "").toString().trim().toUpperCase();
+      const rowSection = (row[SECTION_COL] || "").toString().trim();
+      const rowLine = (row[LINE_COL] || "").toString().trim();
+
+      // If employee is not active and matches the section (and line if provided)
+      if (status !== "ACTIVE" && status !== "" && rowSection === section) {
+        if (!line || rowLine === line) {
+          separated.push({
+            name: row[NAME_COL],
+            position: row[POSITION_COL],
+            status: status,
+            dateLeft: "" // Could be pulled from a separate 'Last Working Day' column if available
+          });
+        }
+      }
+    }
+
+    return separated;
+  } catch (e) {
+    Logger.log("Error in getSeparatedEmployees: " + e);
+    return [];
+  }
 }
 
 // ============================================================
